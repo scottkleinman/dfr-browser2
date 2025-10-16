@@ -24,7 +24,7 @@ coverage.xml
 htmlcov/
 
 # VS Code workspace settings
-.vscode-workspace
+*.code-workspace
 
 # Jupyter Notebook
 .ipynb_checkpoints
