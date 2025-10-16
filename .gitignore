@@ -23,6 +23,9 @@ coverage.xml
 .pytest_cache/
 htmlcov/
 
+# VS Code workspace settings
+.vscode-workspace
+
 # Jupyter Notebook
 .ipynb_checkpoints
 
