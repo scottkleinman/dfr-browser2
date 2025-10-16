@@ -27,7 +27,7 @@ htmlcov/
 .ipynb_checkpoints
 
 # WSL files
-Zone.Identifier
+*:Zone.Identifier
 
 # IPython
 profile_default/
