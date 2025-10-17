@@ -706,19 +706,20 @@ Use the GitHub Issues to open a ticket.
 
 ## Changelog
 
-### Version 0.2.2 (Current)
+### Version 0.2.3
+
+- First public release on GitHub.
+
+### Version 0.2.2
 
 - Many small styling bugs fixed.
 - Caching functions tested.
 - Refactored project for pushing to GitHub.
-
-### Version 0.2.2
-
 - Development of a distribution folder.
 - Fix to word links in Topic view.
 - Provide full Markdown conversion for the About page.
 
-### Version 0.2.1 (Current)
+### Version 0.2.1
 
 - Add data validation and error handling
 - Add advanced customisation options: user-defined topic labels/names, hide/rename specific topics, custom metadata field mappings.
