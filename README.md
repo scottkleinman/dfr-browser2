@@ -37,13 +37,13 @@ DFR Browser 2 is based on Andrew Goldstone's [dfr-browser](https://github.com/ag
 - ✅ **Bibliography** - Sortable citation list with custom sorting and IndexedDB caching
 - ✅ **Word Index** - Alphabetical word index with basic/complete vocabulary modes
 - ✅ **About** - Customizable information page with Markdown support
-- ✅ **Settings** - User preferences for display options
+- ✅ **Settings** - User preferences for display options and cache management
 
 ## Getting Started
 
 ### Prerequisites
 
-- Python 3.x (for local server and data preparation). Other server-architectures will be supported in the future.
+- Python 3.x for data preparation. A local server may be started either by Python or Node.js. Other server-architectures will be supported in the future.
 - Modern web browser (Chrome, Firefox, Safari, Edge)
 - MALLET topic model output files and relevant metadata files
 
@@ -74,7 +74,7 @@ Next open your browser and navigate to `http://localhost:8000` (or whatever port
 **Notes:**
 
 1. Dfr Browser 2 requires Single Page Application (SPA) routing behaviour, and the methods above ensure that this is implemented. If you wish to serve or host the application by some other means, you may have to play with your server configuration. Support for more serving/hosting methods is planned for the future.
-2. Although your app will be served on a localhost, internet access is still recommended because the app downloads Google fonts. Without internet access, the fallback font may negatively impact the display.
+2. Although your app will be served on a localhost, internet access is still recommended because the app currently downloads Google fonts. Without internet access, the fallback font may negatively impact the display.
 
 ## File Requirements
 
@@ -227,7 +227,7 @@ External URLs open in a new tab. The page title automatically updates to match t
 
 ```json
 {
-  "data_source": "data/trc.txt",
+  "data_source": "data/docs.txt",
   "topic_keys_file": "data/topic-keys.txt",
   "doc_topic_file": "data/doc-topic.txt",
   "metadata_file": "data/metadata.csv",
@@ -236,7 +236,7 @@ External URLs open in a new tab. The page title automatically updates to match t
 }
 ```
 
-All paths are relative to the application root. If you wish to provide users with access to the original documents, use the `data_source` field. It should point to a text file in the format described under Source Text File above.
+All paths are relative to the application root. If you wish to provide users with access to the original documents, use the `data_source` field. It should point to a text file in the format described under Source Text File above. If the `embargo` field is set to `true`, the `data_source` will be ignored.
 
 ### File Upload
 
@@ -257,7 +257,7 @@ Providing a bibliography allows the app to provide well-formatted bibliographica
   "bibliography": {
     "path": "data/bibliography.json",
     "style": "chicago",
-    "locale": "en-GB"
+    "locale": "en-US"
   }
 }
 ```
@@ -328,15 +328,11 @@ User-configurable defaults:
 
 Users can override these via the Settings modal in the app. Changes are saved to localStorage and take effect immediately.
 
-- **showHiddenTopics**: Forces any topics hidden elsewhere the configuration to be displayed
+- **showHiddenTopics**: Forces any topics hidden elsewhere the configuration to be displayed (see Topic Customization below)
 - **wordsInLists**: The number of words to display (in order of prominence) whenever there is a list of words
 - **wordsInTopic**: The number of words to display (in order of prominence) to be displayed in the Top Word Distribution card of Topic pages
 - **wordsInCircles**: The number of words to display (in order of prominence) in the Overview Grid and Scaled displays
 - **topicDocs**: The number of documents (in order of prominence) to be displayed in the Top Documents card of Topic pages
-
-### About Page Content
-
-The default About page content can be replaced by any content formatted in Markdown. The Markdown is converted to HTML using [markdown-it](https://github.com/markdown-it/markdown-it). Since the text must be represented on a single line in JSON, you should use `\n` to indicate line breaks.
 
 ### Topic Customization
 
@@ -351,21 +347,77 @@ Customize topic display and metadata field mappings:
     },
     "hidden": [3, 7, 15]
   },
-  "metadata": {
-    "fieldMappings": {
-      "title": "article_title",
-      "author": "creator",
-      "year": "publication_year"
-    }
-  }
 }
 ```
 
 - **topics.labels**: Override default topic numbering with custom labels
 - **topics.hidden**: Hide specific topics from all views (can be toggled in Settings)
-- **metadata.fieldMappings**: Map custom CSV column names to internal field names
 
-See [TOPIC_CUSTOMIZATION.md](TOPIC_CUSTOMIZATION.md) for detailed documentation.
+**Note**:
+
+Hiding topics may remove low-quality or incoherent topics, or topics that are artifacts of the modeling process, from view. This may help focus focus analysis on topics of interest. But it can also be deceptive, so this feature should be used with care.
+
+### Metadata Field Mappings
+
+Map non-standard metadata field names to the internal names expected by the application.
+
+```json
+{
+  "metadata": {
+    "fieldMappings": {
+      "title": "article_title",
+      "author": "creator",
+      "year": "publication_year",
+      "journal": "venue"
+    }
+  }
+}
+```
+
+**How it works:**
+
+- The application internally uses standard field names: `title`, `author`, `year`, `journal`, etc.
+- If your metadata CSV uses different column names, map them here
+- The application will automatically use the mapped names when accessing metadata
+
+**Required fields** (must be mapped if using different names):
+
+- `docNum` - Document number (0-based index)
+- `docName` - Document identifier
+- `title` - Document title
+- `year` - Publication year
+
+**Example scenario:**
+
+Your metadata CSV has these columns:
+
+```csv
+doc_index,doc_id,article_title,creator,pub_year,venue
+0,doc1,Example Article,Smith J.,2020,Journal of Examples
+```
+
+Configure the mapping:
+
+```json
+{
+  "metadata": {
+    "fieldMappings": {
+      "docNum": "doc_index",
+      "docName": "doc_id",
+      "title": "article_title",
+      "author": "creator",
+      "year": "pub_year",
+      "journal": "venue"
+    }
+  }
+}
+```
+
+Now the application will correctly access your metadata using the custom field names.
+
+### About Page Content
+
+The default About page content can be replaced by any content formatted in Markdown. The Markdown is converted to HTML using [markdown-it](https://github.com/markdown-it/markdown-it). Since the text must be represented on a single line in JSON, you should use `\n` to indicate line breaks.
 
 ## Application Views
 
@@ -488,7 +540,7 @@ URLs are automatically encoded to handle special characters
 
 ## Localization
 
-The application includes localization support for sorting:
+The application includes localization support for sorting. Localization for application labels may be implemented in the future.
 
 ### Changing the Default Language
 
@@ -548,12 +600,13 @@ Currently tested only on Chrome and Firefox.
 
 ### Known Issues
 
-- The application must be served using the built-in `serve.py` in order for the routing to work correctly. At some point, a server configuration script for Node.js will be added.
+- The application must be served using the built-in `serve.py` in order for the routing to work correctly. Support for serving the app by other means and for hosting the app on a public server will be added soon.
 - Large datasets can take a long time to load. Once they are loaded and cached, page loading is fast.
+- The Python data preparation scripts in the `bin` directory are not yet ready for primetime (as of v0.2.3). Use with caution.
 
 ## Development
 
-### Project Structure
+### App Structure
 
 ```bash
 dist/
@@ -630,11 +683,11 @@ All routes and data loading operations are logged in the browser console with th
 
 ### Testing
 
-The app has been tested with some sample data is derived from a collection of short descriptions of violence in Apartheid South Africa, which comes from Volume 7 of the Truth and Reconciliation Commission’s final report. The data was collected by by William Mattingly for his [*Introduction to Python for Digital Humanities*](python-textbook.pythonhumanities.com), 2022. However, it has not been tested with multiple or larger datasets, and there are curently no test scripts.
+Currently the `tests` folder only includes tests for cache management. To run the test, copy the folder into your app's root, start the app and navigate to `tests/test_cache.html`.
 
 ## Differences from Original DFR Browser
 
-The original dfr-browser has been re-built from the ground up using the latest Bootstrap and D3 libraries, as well as a third-party routing system. Most MALLET data is loaded from the MALLET state file and converted in the app, which may lead to a performance hit, especially when the app is first loaded. Once the data is loaded, it is cached, so it the app should be fast thereafter.
+The [original dfr-browser](https://github.com/agoldst/dfr-browser) has been re-built from the ground up using the latest Bootstrap and D3 libraries, as well as a third-party routing system. Most MALLET data is loaded from the MALLET state file and converted in the app, which may lead to a performance hit, especially when the app is first loaded. Once the data is loaded, it is cached, so it the app should be fast thereafter.
 
 The app is freed from its expectation of journal article data, and the user is now able to more easily generate references in a wide range of bibliographical styles. The user can also designate a location for their original documents and display them directly within the app. The configuration file also enables language customization to support multilingual sorting rules.
 
@@ -646,7 +699,7 @@ Based on [dfr-browser](https://github.com/agoldst/dfr-browser) by Andrew Goldsto
 
 ## Licence
 
-The appp is distributed under the MIT Licence.
+The app is distributed under the MIT Licence.
 
 ## Support
 
@@ -655,6 +708,12 @@ Use the GitHub Issues to open a ticket.
 ## Changelog
 
 ### Version 0.2.2 (Current)
+
+- Many small styling bugs fixed.
+- Caching functions tested.
+- Refactored project for pushing to GitHub.
+
+### Version 0.2.2
 
 - Development of a distribution folder.
 - Fix to word links in Topic view.
