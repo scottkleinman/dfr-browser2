@@ -156,7 +156,7 @@ topic,x,y
 1,0.2,0.8
 ```
 
-The `topic_coords.csv` file may be generated from the MALLET state file using the `bin/prepare_data.py` script.
+The `topic_coords.csv` file may be generated from the MALLET state file using the `bin/prepare_dfr_data.py` script.
 
 #### 2. Bibliography File (`bibliography.json`)
 
@@ -642,8 +642,7 @@ dist/
 │   └── markdown-it.min.js         # Markdown parser for About page
 ├── bin/
 │   ├── prepare_dfr_data.py        # Data preparation script
-│   ├── metadata_to_csl.py         # Metadata to CSL conversion
-│   └── scale_topics.py            # Topic coordinate scaling
+│   └── metadata_to_csl.py         # Metadata to CSL conversion
 └── data/                          # The files below would be added by the user
     ├── topic-keys.txt             # MALLET topic-keys output
     ├── doc-topics.txt             # MALLET doc-topics output

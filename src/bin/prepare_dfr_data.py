@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
 Comprehensive MALLET topic-state file processor for dfr-browser.
-Combines functionality from convert_state.py, extract_doc_topic_counts.py, and extract_doc_lengths.py.
 
 Processes a MALLET topic-state.gz file and generates all necessary files for dfr-browser:
+
 - topic-keys.txt (topic words for browser)
 - doc-topic.txt (normalized proportions for browser)
 - topic_coords.csv (2D topic coordinates for browser)
@@ -27,7 +27,19 @@ from sklearn.manifold import MDS
 
 
 # --- Topic coordinate generation (from scale_topics.py) ---
-def topic_word_matrix_from_topic_words(topic_words, vocab, top_n=15):
+def topic_word_matrix_from_topic_words(
+    topic_words: list[dict], vocab: list[str], top_n: int = 15
+) -> np.ndarray:
+    """Create topic-word matrix from topic_words data structure.
+
+    Args:
+        topic_words (list[dict]): List of dicts with 'words' key for each topic
+        vocab (list[str]): List of all unique words across topics
+        top_n (int): Number of top words to consider per topic
+
+    Returns:
+        np.ndarray: Topic-word matrix of shape (num_topics, vocab_size)
+    """
     mat = np.zeros((len(topic_words), len(vocab)))
     for i, topic in enumerate(topic_words):
         words = topic["words"][:top_n]
@@ -39,7 +51,16 @@ def topic_word_matrix_from_topic_words(topic_words, vocab, top_n=15):
     return mat
 
 
-def jensen_shannon(p, q):
+def jensen_shannon(p: np.ndarray, q: np.ndarray) -> float:
+    """Compute Jensen-Shannon divergence between two probability distributions.
+
+    Args:
+        p (np.ndarray): First probability distribution (1D np.ndarray)
+        q (np.ndarray): Second probability distribution (1D np.ndarray)
+
+    Returns:
+        float: Jensen-Shannon divergence
+    """
     m = 0.5 * (p + q)
 
     def kl(a, b):
@@ -49,7 +70,15 @@ def jensen_shannon(p, q):
     return 0.5 * kl(p, m) + 0.5 * kl(q, m)
 
 
-def jsd_matrix(mat):
+def jsd_matrix(mat: np.ndarray) -> np.ndarray:
+    """Compute Jensen-Shannon distance matrix for topic-word distributions.
+
+    Args:
+        mat (np.ndarray): Topic-word matrix (num_topics x vocab_size)
+
+    Returns:
+        np.ndarray: Jensen-Shannon distance matrix (num_topics x num_topics)
+    """
     n = mat.shape[0]
     dist = np.zeros((n, n))
     for i in range(n):
@@ -58,13 +87,31 @@ def jsd_matrix(mat):
     return dist
 
 
-def compute_mds(dist, n_components=2):
+def compute_mds(dist: np.ndarray, n_components: int = 2) -> np.ndarray:
+    """Compute MDS coordinates from distance matrix.
+
+    Args:
+        dist (np.ndarray): Distance matrix (num_topics x num_topics)
+        n_components (int): Number of MDS components (default: 2)
+
+    Returns:
+        np.ndarray: MDS coordinates (num_topics x n_components)
+    """
     mds = MDS(n_components=n_components, dissimilarity="precomputed", random_state=42)
     coords = mds.fit_transform(dist)
     return coords
 
 
-def write_topic_coords_csv(topic_words, output_dir, top_n=15):
+def write_topic_coords_csv(
+    topic_words: list[dict], output_dir: str, top_n: int = 15
+) -> None:
+    """Generate and write topic_coords.csv for dfr-browser.
+
+    Args:
+        topic_words (list[dict]): List of topic words data structures
+        output_dir (str): Directory to write the CSV file
+        top_n (int): Number of top words to consider per topic
+    """
     # Build vocab from all top words
     vocab = sorted({w for topic in topic_words for w in topic["words"][:top_n]})
     mat = topic_word_matrix_from_topic_words(topic_words, vocab, top_n=top_n)
@@ -81,7 +128,16 @@ def write_topic_coords_csv(topic_words, output_dir, top_n=15):
 def get_top_words_and_weights(
     topic_word_counts: list[int], vocab: dict, n: int
 ) -> dict[str, list[str | float]]:
-    """Get the top n words and their weights for a topic."""
+    """Get the top n words and their weights for a topic.
+
+    Args:
+        topic_word_counts (list[int]): List of word counts for the topic
+        vocab (dict): Mapping of word indices to word strings
+        n (int): Number of top words to retrieve
+
+    Returns:
+        dict: Dictionary with 'words' and 'weights' lists
+    """
     word_indices = list(range(len(topic_word_counts)))
     word_indices.sort(key=lambda i: -topic_word_counts[i])
     return {
@@ -91,7 +147,14 @@ def get_top_words_and_weights(
 
 
 def sparse_doc_topic_matrix(doc_topic_matrix: list[list[int]]) -> dict:
-    """Convert a dense doc-topic matrix to a sparse representation."""
+    """Convert a dense doc-topic matrix to a sparse representation.
+
+    Args:
+        doc_topic_matrix (list[list[int]]): Dense doc-topic matrix (num_topics x num_docs)
+
+    Returns:
+        dict: Sparse matrix representation with 'i', 'p', 'x' keys
+    """
     num_docs = len(doc_topic_matrix[0])
     indices = []
     indptr = [0]
@@ -109,7 +172,14 @@ def sparse_doc_topic_matrix(doc_topic_matrix: list[list[int]]) -> dict:
 
 
 def normalize_doc_topic_proportions(doc_topic_counts: list[dict]) -> list[list[float]]:
-    """Convert raw counts to normalized proportions for each document."""
+    """Convert raw counts to normalized proportions for each document.
+
+    Args:
+        doc_topic_counts (list[dict]): List of dicts with topic counts per document
+
+    Returns:
+        list[list[float]]: List of normalized topic proportions per document
+    """
     proportions = []
     for doc_counts in doc_topic_counts:
         total = sum(doc_counts.values())
@@ -127,7 +197,12 @@ def normalize_doc_topic_proportions(doc_topic_counts: list[dict]) -> list[list[f
 
 
 def write_topic_keys_txt(topic_words: list[dict], output_dir: str) -> None:
-    """Write topic-keys.txt file compatible with dfr-browser."""
+    """Write topic-keys.txt file compatible with dfr-browser.
+
+    Args:
+        topic_words (list[dict]): List of topic words data structures
+        output_dir (str): Directory to write the topic-keys.txt file
+    """
     filepath = os.path.join(output_dir, "topic-keys.txt")
     with open(filepath, "w") as f:
         for i, topic in enumerate(topic_words):
@@ -138,7 +213,12 @@ def write_topic_keys_txt(topic_words: list[dict], output_dir: str) -> None:
 
 
 def write_doc_topic_txt(doc_proportions: list[list[float]], output_dir: str) -> None:
-    """Write doc-topic.txt file compatible with dfr-browser."""
+    """Write doc-topic.txt file compatible with dfr-browser.
+
+    Args:
+        doc_proportions (list[list[float]]): List of normalized topic proportions per document
+        output_dir (str): Directory to write the doc-topic.txt file
+    """
     filepath = os.path.join(output_dir, "doc-topic.txt")
     with open(filepath, "w") as f:
         for doc_idx, proportions in enumerate(doc_proportions):
@@ -153,24 +233,10 @@ def write_doc_topic_counts_csv(
 ) -> None:
     """Write doc-topic-counts.csv with raw counts.
 
-    Examples:
-        %(prog)s topic-state.gz                    # Generate all files in current directory
-        %(prog)s topic-state.gz -o sample_data    # Generate files in sample_data/ directory
-        %(prog)s topic-state.gz --core-only       # Generate only core dfr-browser files
-        %(prog)s topic-state.gz --top-words 50    # Include 50 top words per topic (default: 30)
-
-    Generated files:
-        Core files (always created):
-            - topic-keys.txt      (topic words for dfr-browser)
-            - doc-topic.txt       (document-topic proportions)
-            - topic_coords.csv    (2D topic coordinates for browser)
-            - doc-lengths.txt     (token counts per document)
-            - metadata.csv        (basic metadata if missing)
-
-        Additional files (with --all, default):
-            - doc-topic-counts.csv (raw topic counts per document)
-            - tw.json             (topic-words JSON for advanced features)
-            - dt.zip              (sparse doc-topic matrix)
+    Args:
+        doc_topic_counts (list[dict]): List of dicts with topic counts per document
+        num_topics (int): Total number of topics
+        output_dir (str): Directory to write the CSV file
     """
     filepath = os.path.join(output_dir, "doc-topic-counts.csv")
     with open(filepath, "w", newline="") as f:
@@ -183,7 +249,12 @@ def write_doc_topic_counts_csv(
 
 
 def write_basic_metadata_csv(num_docs: int, output_dir: str) -> None:
-    """Write basic metadata.csv if it doesn't exist."""
+    """Write basic metadata.csv if it doesn't exist.
+
+    Args:
+        num_docs (int): Number of documents
+        output_dir (str): Directory to write the metadata.csv file
+    """
     filepath = os.path.join(output_dir, "metadata.csv")
     if os.path.exists(filepath):
         print("metadata.csv already exists, skipping generation")
@@ -200,7 +271,13 @@ def write_basic_metadata_csv(num_docs: int, output_dir: str) -> None:
 def write_topic_words_json(
     alpha: list, topic_words: list[dict], output_dir: str
 ) -> None:
-    """Write tw.json for advanced features."""
+    """Write tw.json for advanced features.
+
+    Args:
+        alpha (list): List of alpha parameters for topics
+        topic_words (list[dict]): List of topic words data structures
+        output_dir (str): Directory to write the tw.json file
+    """
     filepath = os.path.join(output_dir, "tw.json")
     output = {"alpha": alpha, "tw": topic_words}
     with open(filepath, "w") as f:
@@ -209,7 +286,12 @@ def write_topic_words_json(
 
 
 def write_doc_topics_zip(sparse_matrix: dict, output_dir: str) -> None:
-    """Write dt.zip for advanced features."""
+    """Write dt.zip for advanced features.
+
+    Args:
+        sparse_matrix (dict): Sparse doc-topic matrix representation
+        output_dir (str): Directory to write the dt.zip file
+    """
     filepath = os.path.join(output_dir, "dt.zip")
     with zf.ZipFile(filepath, "w") as zipf:
         zipf.writestr("dt.json", json.dumps(sparse_matrix))
@@ -220,16 +302,16 @@ def process_mallet_state_file(
     state_file: str,
     output_dir: str = ".",
     n_top_words: int = 30,
-    generate_all: bool = True,
+    generate_all: bool = False,
 ) -> None:
     """
-    Process MALLET topic-state file and generate all dfr-browser files.
+    Process MALLET topic-state file and generate dfr-browser files.
 
     Args:
-        state_file: Path to MALLET topic-state.gz file
-        output_dir: Directory to write output files
-        n_top_words: Number of top words per topic to save
-        generate_all: Whether to generate all file types (True) or just core files (False)
+        state_file (str): Path to MALLET topic-state.gz file
+        output_dir (str): Directory to write output files
+        n_top_words (int): Number of top words per topic to save
+        generate_all (bool): Whether to generate additional files beyond core requirements
     """
     print(f"Processing MALLET state file: {state_file}")
     print(f"Output directory: {output_dir}")
@@ -315,11 +397,10 @@ def process_mallet_state_file(
     # Write core dfr-browser files (always generated)
     write_topic_keys_txt(topic_words, output_dir)
     write_doc_topic_txt(doc_proportions, output_dir)
-    write_basic_metadata_csv(num_docs, output_dir)
-    # Write topic_coords.csv (2D topic coordinates for browser)
     write_topic_coords_csv(topic_words, output_dir, top_n=15)
+    write_basic_metadata_csv(num_docs, output_dir)
 
-    # Write additional files if requested
+    # Write additional files if requested with --all flag
     if generate_all:
         write_doc_topic_counts_csv(doc_topic_counts, num_topics, output_dir)
         write_topic_words_json(alpha, topic_words, output_dir)
@@ -342,18 +423,19 @@ if __name__ == "__main__":
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  %(prog)s topic-state.gz                   # Generate all files in current directory
-  %(prog)s topic-state.gz -o sample_data    # Generate files in sample_data/ directory
-  %(prog)s topic-state.gz --core-only       # Generate only core dfr-browser files
+  %(prog)s topic-state.gz                   # Generate core files in current directory
+  %(prog)s topic-state.gz -o sample_data    # Generate core files in sample_data/ directory
+  %(prog)s topic-state.gz --all             # Generate all files including advanced features
   %(prog)s topic-state.gz --top-words 50    # Include 50 top words per topic (default: 30)
 
 Generated files:
   Core files (always created):
     - topic-keys.txt      (topic words for dfr-browser)
     - doc-topic.txt       (document-topic proportions)
+    - topic_coords.csv    (2D topic coordinates for browser)
     - metadata.csv        (basic metadata if missing)
 
-  Additional files (with --all, default):
+  Additional files (with --all flag):
     - doc-topic-counts.csv (raw topic counts per document)
     - tw.json             (topic-words JSON for advanced features)
     - dt.zip              (sparse doc-topic matrix)
@@ -376,9 +458,9 @@ Generated files:
         help="Number of top words per topic to save (default: 30)",
     )
     parser.add_argument(
-        "--core-only",
+        "--all",
         action="store_true",
-        help="Generate only core dfr-browser files (skip advanced features)",
+        help="Generate all files including advanced features (default: core files only)",
     )
 
     args = parser.parse_args()
@@ -388,5 +470,5 @@ Generated files:
         exit(1)
 
     process_mallet_state_file(
-        args.statefile, args.output_dir, args.top_words, generate_all=not args.core_only
+        args.statefile, args.output_dir, args.top_words, generate_all=args.all
     )
