@@ -48,6 +48,9 @@ node_modules/
 .vscode.json
 .vscode/
 
+# Markdownlint files
+.markdownlint.json
+
 # Private development files
 deprecated/
 
