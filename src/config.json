@@ -11,7 +11,7 @@
     "favicon": "/assets/favicon-16x16.png"
   },
   "embargo": true,
-  "ddata_source": "data/docs.txt",
+  "data_source": "data/docs.txt",
   "topic_keys_file": "data/topic-keys.txt",
   "doc_topic_file": "data/doc-topic.txt",
   "metadata_file": "data/metadata.csv",
