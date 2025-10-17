@@ -697,6 +697,8 @@ New styling provides a fresh look and easier customization potential. In some ca
 
 Based on [dfr-browser](https://github.com/agoldst/dfr-browser) by Andrew Goldstone.
 
+This project began as a test case for using <a href="https://github.com/github/spec-kit" target="_blank">GitHub Spec-Kit</a>. Most of the code and document generation was done in collaboratio with Claude Sonnet 4 or Claude Sonnet 4.5.
+
 ## Licence
 
 The app is distributed under the MIT Licence.
