@@ -644,16 +644,13 @@ dist/
 │   ├── prepare_dfr_data.py        # Data preparation script
 │   ├── metadata_to_csl.py         # Metadata to CSL conversion
 │   └── scale_topics.py            # Topic coordinate scaling
-└── data/
+└── data/                          # The files below would be added by the user
     ├── topic-keys.txt             # MALLET topic-keys output
     ├── doc-topics.txt             # MALLET doc-topics output
     ├── doc-topic-counts.csv       # Document-topic count matrix
     ├── metadata.csv               # Document metadata
-    ├── topic-state.gz             # MALLET topic state (optional)
+    ├── topic-state.gz             # MALLET topic state
     ├── topic_coords.csv           # Topic coordinates for scaled view
-    ├── tw.json                    # Topic-word weights
-    ├── trc.txt                    # Topic correlation data
-    ├── doc-lengths.txt            # Document length data
     └── bibliography.json          # CSL-formatted citations
 ```
 
