@@ -681,6 +681,13 @@ All routes and data loading operations are logged in the browser console with th
 
 Currently the `tests` folder only includes tests for cache management. To run the test, copy the folder into your app's root, start the app and navigate to `tests/test_cache.html`.
 
+### Roadmap
+
+1. Change the "View Document" to a better label ("View Topics in Document"?).
+2. "Cite" button in Document View with citation.js.
+3. Model Diagnostics visualisation in Overview.
+4. Footer with credit line.
+
 ## Differences from Original DFR Browser
 
 The [original dfr-browser](https://github.com/agoldst/dfr-browser) has been re-built from the ground up using the latest Bootstrap and D3 libraries, as well as a third-party routing system. Most MALLET data is loaded from the MALLET state file and converted in the app, which may lead to a performance hit, especially when the app is first loaded. Once the data is loaded, it is cached, so it the app should be fast thereafter.
