@@ -6,6 +6,7 @@ import { loadWordView } from './word.js';
 import { loadBibliography } from './bibliography.js';
 import { loadWordList } from './wordlist.js';
 import { loadAboutView } from './about.js';
+import { renderCitationView } from './citation.js';
 import CacheManager from './cache-manager.js';
 import CachedDataLoader from './cached-data-loader.js';
 import ErrorHandler from './error-handler.js';
@@ -825,6 +826,15 @@ function setupRoutes() {
     loadBibliography(
       window.dfrState.metadata
     );
+  });
+
+  // Citation route
+  window.page('/citation/:id', async (ctx) => {
+    if (!await ensureDataLoaded()) return;
+    console.log('[DFR] Route: Citation view:', ctx.params.id);
+    setActiveNav('/bibliography');
+    const docIndex = parseInt(ctx.params.id);
+    await renderCitationView(docIndex);
   });
 
   // Word list/index route

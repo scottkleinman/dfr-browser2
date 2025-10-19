@@ -679,14 +679,12 @@ All routes and data loading operations are logged in the browser console with th
 
 ### Testing
 
-Currently the `tests` folder only includes tests for cache management. To run the test, copy the folder into your app's root, start the app and navigate to `tests/test_cache.html`.
+Currently the `tests` folder only includes tests for cache management and citation conversion. To run the test, copy the folder into your app's root, start the app and navigate to `tests/test_cache.html` or `tests/test_citation.html`.
 
 ### Roadmap
 
-1. Change the "View Document" to a better label ("View Topics in Document"?).
-2. "Cite" button in Document View with citation.js.
-3. Model Diagnostics visualisation in Overview.
-4. Footer with credit line.
+1. Model Diagnostics visualisation in Overview.
+2. Footer with credit line.
 
 ## Differences from Original DFR Browser
 

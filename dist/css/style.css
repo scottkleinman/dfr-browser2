@@ -1042,3 +1042,64 @@ th.sortable.sort-desc::after {
   transform: scale(1.1);
   transition: transform var(--transition-fast);
 }
+
+/* ========================================
+   Citation View Styles
+   ======================================== */
+
+/* Citation style selector dropdown */
+#citation-style-select {
+  min-width: 100px;
+  color: var(--color-neutral-900) !important;
+  background-color: white !important;
+  border: 1px solid var(--color-neutral-400);
+}
+
+#citation-style-select option {
+  color: var(--color-neutral-900) !important;
+  background-color: white !important;
+}
+
+#citation-style-select:focus {
+  border-color: var(--color-primary-500);
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+  color: var(--color-neutral-900) !important;
+}
+
+/* Ensure form-select has proper styling */
+.form-select-sm {
+  color: var(--color-neutral-900) !important;
+  background-color: white !important;
+}
+
+/* Ensure label for citation style is visible */
+.card-header label[for="citation-style-select"] {
+  color: var(--color-neutral-900);
+  font-weight: 500;
+}
+
+/* Citation display area */
+.citation-display {
+  padding: 1rem;
+  background-color: var(--color-neutral-50);
+  border: 1px solid var(--color-neutral-300);
+  border-radius: 0.375rem;
+}
+
+.citation-display .csl-entry {
+  margin-bottom: 0;
+}
+
+.citation-display em {
+  font-style: italic;
+}
+
+.citation-display a {
+  color: var(--color-primary-600);
+  text-decoration: none;
+}
+
+.citation-display a:hover {
+  color: var(--color-primary-700);
+  text-decoration: underline;
+}

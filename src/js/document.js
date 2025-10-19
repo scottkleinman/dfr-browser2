@@ -375,6 +375,12 @@ export async function loadDocumentView(topicKeys, docTopic, metadata, referenceD
     html += `<div>`;
     html += `<span class="badge bg-secondary me-2">Tokens: ${totalTokens}</span>`;
 
+    // Cite button - always visible
+    html += `<button type="button" class="btn btn-primary btn-sm" onclick="window.page('/citation/${referenceData.docIndex}')">`;
+    html += `<i class="bi bi-quote"></i> Cite`;
+    html += `</button>`;
+
+
     if (!appConfig?.embargo) {
       html += `<button type="button" class="btn btn-primary btn-sm" onclick="handleViewTextClick(${JSON.stringify(referenceData).replace(/"/g, '&quot;')})">`;
       html += `View Text`;

@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Citation.js Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 1000px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .test-section {
+      background: white;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .output {
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 4px;
+      padding: 15px;
+      margin-top: 15px;
+      white-space: pre-wrap;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    .status {
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 4px;
+    }
+    .status.pass {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    .status.fail {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+  </style>
+</head>
+<body>
+  <h1>Citation.js Test Suite</h1>
+
+  <div class="test-section">
+    <h2>Test Controls</h2>
+    <button onclick="runAllTests()">Run All Tests</button>
+    <button onclick="clearOutput()">Clear Output</button>
+  </div>
+
+  <div class="test-section">
+    <h2>Citation Style Tests</h2>
+    <button onclick="testAPAFormat()">Test APA Format</button>
+    <button onclick="testMLAFormat()">Test MLA Format</button>
+    <button onclick="testChicagoFormat()">Test Chicago Format</button>
+    <button onclick="testHarvardFormat()">Test Harvard Format</button>
+    <button onclick="testVancouverFormat()">Test Vancouver Format</button>
+    <button onclick="testIEEEFormat()">Test IEEE Format</button>
+  </div>
+
+  <div class="test-section">
+    <h2>Export Format Tests</h2>
+    <button onclick="testBibTeXFormat()">Test BibTeX Format</button>
+    <button onclick="testRISFormat()">Test RIS Format</button>
+  </div>
+
+  <div class="test-section">
+    <h2>Test Output</h2>
+    <div id="output" class="output">Waiting for test to run...</div>
+  </div>
+
+  <script type="module">
+    import { Cite } from '../js/lib/citation.js';
+
+    window.Cite = Cite;
+
+    function log(message) {
+      const output = document.getElementById('output');
+      const timestamp = new Date().toLocaleTimeString();
+      output.textContent += `[${timestamp}] ${message}\n`;
+      output.scrollTop = output.scrollHeight;
+    }
+
+    function addStatus(message, type = 'info') {
+      const output = document.getElementById('output');
+      const div = document.createElement('div');
+      div.className = `status ${type}`;
+      div.textContent = message;
+      const tempDiv = document.createElement('div');
+      tempDiv.appendChild(div);
+      output.innerHTML += tempDiv.innerHTML + '\n';
+      output.scrollTop = output.scrollHeight;
+    }
+
+    window.clearOutput = function() {
+      document.getElementById('output').textContent = '';
+      log('Output cleared');
+    };
+
+    // Sample CSL JSON data
+    const sampleEntry = {
+      id: 'test-1',
+      type: 'article-journal',
+      title: 'A Study of Topic Modeling in Digital Humanities',
+      'container-title': 'Journal of Digital Scholarship',
+      volume: '15',
+      issue: '3',
+      page: '123-145',
+      DOI: '10.1234/jds.2024.001',
+      issued: {
+        'date-parts': [[2024]]
+      },
+      author: [
+        { family: 'Smith', given: 'John' },
+        { family: 'Doe', given: 'Jane' }
+      ]
+    };
+
+    window.testAPAFormat = async function() {
+      log('\n=== Testing APA Format ===');
+
+      try {
+        const cite = new Cite(sampleEntry);
+        const htmlOutput = await cite.format('bibliography', { format: 'html', template: 'apa' });
+        const textOutput = await cite.format('bibliography', { format: 'text', template: 'apa' });
+
+        log('HTML Output:');
+        log(htmlOutput);
+        log('\nText Output:');
+        log(textOutput);
+
+        // Verify output contains expected elements
+        if (htmlOutput.includes('Smith') && htmlOutput.includes('2024') && htmlOutput.includes('Topic Modeling')) {
+          addStatus('✓ APA Format: PASSED', 'pass');
+        } else {
+          addStatus('✗ APA Format: FAILED - Missing expected content', 'fail');
+        }
+
+      } catch (error) {
+        log(`Error: ${error.message}`);
+        addStatus('✗ APA Format: ERROR', 'fail');
+      }
+    };
+
+    window.testMLAFormat = async function() {
+      log('\n=== Testing MLA Format ===');
+
+      try {
+        const cite = new Cite(sampleEntry);
+        const htmlOutput = await cite.format('bibliography', { format: 'html', template: 'mla' });
+        const textOutput = await cite.format('bibliography', { format: 'text', template: 'mla' });
+
+        log('HTML Output:');
+        log(htmlOutput);
+        log('\nText Output:');
+        log(textOutput);
+
+        // Verify output contains expected elements
+        if (htmlOutput.includes('Smith') && htmlOutput.includes('2024') && htmlOutput.includes('Topic Modeling')) {
+          addStatus('✓ MLA Format: PASSED', 'pass');
+        } else {
+          addStatus('✗ MLA Format: FAILED - Missing expected content', 'fail');
+        }
+
+      } catch (error) {
+        log(`Error: ${error.message}`);
+        addStatus('✗ MLA Format: ERROR', 'fail');
+      }
+    };
+
+    window.testChicagoFormat = async function() {
+      log('\n=== Testing Chicago Format ===');
+
+      try {
+        const cite = new Cite(sampleEntry);
+        const htmlOutput = await cite.format('bibliography', { format: 'html', template: 'chicago' });
+        const textOutput = await cite.format('bibliography', { format: 'text', template: 'chicago' });
+
+        log('HTML Output:');
+        log(htmlOutput);
+        log('\nText Output:');
+        log(textOutput);
+
+        // Verify output contains expected elements
+        if (htmlOutput.includes('Smith') && htmlOutput.includes('2024') && htmlOutput.includes('Topic Modeling')) {
+          addStatus('✓ Chicago Format: PASSED', 'pass');
+        } else {
+          addStatus('✗ Chicago Format: FAILED - Missing expected content', 'fail');
+        }
+
+      } catch (error) {
+        log(`Error: ${error.message}`);
+        addStatus('✗ Chicago Format: ERROR', 'fail');
+      }
+    };
+
+    window.testHarvardFormat = async function() {
+      log('\n=== Testing Harvard Format ===');
+
+      try {
+        const cite = new Cite(sampleEntry);
+        const htmlOutput = await cite.format('bibliography', { format: 'html', template: 'harvard' });
+        const textOutput = await cite.format('bibliography', { format: 'text', template: 'harvard' });
+
+        log('HTML Output:');
+        log(htmlOutput);
+        log('\nText Output:');
+        log(textOutput);
+
+        // Verify output contains expected elements
+        if (htmlOutput.includes('Smith') && htmlOutput.includes('2024') && htmlOutput.includes('Topic Modeling')) {
+          addStatus('✓ Harvard Format: PASSED', 'pass');
+        } else {
+          addStatus('✗ Harvard Format: FAILED - Missing expected content', 'fail');
+        }
+
+      } catch (error) {
+        log(`Error: ${error.message}`);
+        addStatus('✗ Harvard Format: ERROR', 'fail');
+      }
+    };
+
+    window.testVancouverFormat = async function() {
+      log('\n=== Testing Vancouver Format ===');
+
+      try {
+        const cite = new Cite(sampleEntry);
+        const htmlOutput = await cite.format('bibliography', { format: 'html', template: 'vancouver' });
+        const textOutput = await cite.format('bibliography', { format: 'text', template: 'vancouver' });
+
+        log('HTML Output:');
+        log(htmlOutput);
+        log('\nText Output:');
+        log(textOutput);
+
+        // Verify output contains expected elements
+        if (htmlOutput.includes('Smith') && htmlOutput.includes('2024') && htmlOutput.includes('Topic Modeling')) {
+          addStatus('✓ Vancouver Format: PASSED', 'pass');
+        } else {
+          addStatus('✗ Vancouver Format: FAILED - Missing expected content', 'fail');
+        }
+
+      } catch (error) {
+        log(`Error: ${error.message}`);
+        addStatus('✗ Vancouver Format: ERROR', 'fail');
+      }
+    };
+
+    window.testIEEEFormat = async function() {
+      log('\n=== Testing IEEE Format ===');
+
+      try {
+        const cite = new Cite(sampleEntry);
+        const htmlOutput = await cite.format('bibliography', { format: 'html', template: 'ieee' });
+        const textOutput = await cite.format('bibliography', { format: 'text', template: 'ieee' });
+
+        log('HTML Output:');
+        log(htmlOutput);
+        log('\nText Output:');
+        log(textOutput);
+
+        // Verify output contains expected elements
+        if (htmlOutput.includes('Smith') && htmlOutput.includes('2024') && htmlOutput.includes('Topic Modeling')) {
+          addStatus('✓ IEEE Format: PASSED', 'pass');
+        } else {
+          addStatus('✗ IEEE Format: FAILED - Missing expected content', 'fail');
+        }
+
+      } catch (error) {
+        log(`Error: ${error.message}`);
+        addStatus('✗ IEEE Format: ERROR', 'fail');
+      }
+    };
+
+    window.testBibTeXFormat = async function() {
+      log('\n=== Testing BibTeX Format ===');
+
+      try {
+        const cite = new Cite(sampleEntry);
+        const bibtex = await cite.format('bibtex');
+
+        log('BibTeX Output:');
+        log(bibtex);
+
+        // Verify output contains expected elements
+        if (bibtex.includes('@article') && bibtex.includes('author =') && bibtex.includes('doi =')) {
+          addStatus('✓ BibTeX Format: PASSED', 'pass');
+        } else {
+          addStatus('✗ BibTeX Format: FAILED - Missing expected fields', 'fail');
+        }
+
+      } catch (error) {
+        log(`Error: ${error.message}`);
+        addStatus('✗ BibTeX Format: ERROR', 'fail');
+      }
+    };
+
+    window.testRISFormat = async function() {
+      log('\n=== Testing RIS Format ===');
+
+      try {
+        const cite = new Cite(sampleEntry);
+        const ris = await cite.format('ris');
+
+        log('RIS Output:');
+        log(ris);
+
+        // Verify output contains expected elements
+        if (ris.includes('TY  - JOUR') && ris.includes('AU  -') && ris.includes('ER  -')) {
+          addStatus('✓ RIS Format: PASSED', 'pass');
+        } else {
+          addStatus('✗ RIS Format: FAILED - Missing expected tags', 'fail');
+        }
+
+      } catch (error) {
+        log(`Error: ${error.message}`);
+        addStatus('✗ RIS Format: ERROR', 'fail');
+      }
+    };
+
+    window.runAllTests = async function() {
+      clearOutput();
+      log('='.repeat(50));
+      log('STARTING CITATION TEST SUITE');
+      log('='.repeat(50));
+
+      // Test all 6 citation styles
+      await testAPAFormat();
+      await testMLAFormat();
+      await testChicagoFormat();
+      await testHarvardFormat();
+      await testVancouverFormat();
+      await testIEEEFormat();
+
+      // Test export formats
+      await testBibTeXFormat();
+      await testRISFormat();
+
+      log('\n' + '='.repeat(50));
+      log('TEST SUITE COMPLETE');
+      log('='.repeat(50));
+    };
+
+    // Initialize
+    log('Citation Test Suite Ready');
+    log('Click "Run All Tests" to begin testing');
+  </script>
+</body>
+</html>

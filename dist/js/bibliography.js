@@ -1189,12 +1189,19 @@ function generateEntryHTML(doc) {
   html += `<button type="button" class="btn btn-outline-primary btn-sm view-document-btn" `;
   html += `data-doc-index="${docIndex}" `;
   html += `data-doc-id="${doc.id || 'unknown'}">`;
-  html += `<i class="bi bi-file-text"></i> View Document`;
+  html += `<i class="bi bi-file-text"></i> View Document Topics`;
+  html += `</button>`;
+
+  // Cite button
+  html += `<button type="button" class="btn btn-outline-secondary btn-sm cite-document-btn" `;
+  html += `data-doc-index="${docIndex}" `;
+  html += `data-doc-id="${doc.id || 'unknown'}">`;
+  html += `<i class="bi bi-quote"></i> Cite`;
   html += `</button>`;
 
   // Show document ID if available
   if (doc.id) {
-    html += `<small class="text-muted">ID: ${doc.id}</small>`;
+    html += `<small class="text-muted ms-2">ID: ${doc.id}</small>`;
   }
 
   html += `</div>`;
@@ -1437,6 +1444,22 @@ export async function loadBibliography(topicKeys, docTopic, metadata) {
       if (docIndex !== -1 && !isNaN(docIndex) && docIndex >= 0) {
         // Navigate to document view
         window.page(`/document/${docIndex}`);
+      } else {
+        console.warn('[Bibliography] Invalid document index:', docIndex, 'DocId:', docId);
+        alert('Document not found in the current dataset.');
+      }
+    }
+
+    // Handle "Cite" button clicks
+    if (e.target.closest('.cite-document-btn')) {
+      e.preventDefault();
+      const button = e.target.closest('.cite-document-btn');
+      const docIndex = parseInt(button.getAttribute('data-doc-index'));
+      const docId = button.getAttribute('data-doc-id');
+
+      if (docIndex !== -1 && !isNaN(docIndex) && docIndex >= 0) {
+        // Navigate to citation view
+        window.page(`/citation/${docIndex}`);
       } else {
         console.warn('[Bibliography] Invalid document index:', docIndex, 'DocId:', docId);
         alert('Document not found in the current dataset.');
