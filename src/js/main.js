@@ -515,6 +515,12 @@ async function autoLoadData() {
 
     // Mark data as loaded
     window.dfrState.dataLoaded = true;
+
+    // Show footer after data is loaded
+    const footer = document.getElementById('app-footer');
+    if (footer) {
+      footer.style.display = 'block';
+    }
   } catch (e) {
     console.error('[DFR] Sample data not loaded:', e);
     throw e; // Re-throw so ensureDataLoaded can catch it
@@ -626,6 +632,12 @@ function setupFileUploadHandler() {
 
       // Mark data as loaded
       window.dfrState.dataLoaded = true;
+
+      // Show footer after data is loaded
+      const footer = document.getElementById('app-footer');
+      if (footer) {
+        footer.style.display = 'block';
+      }
 
       // Load overview with the data
       window.page('/');
