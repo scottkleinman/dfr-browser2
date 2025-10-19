@@ -684,7 +684,6 @@ Currently the `tests` folder only includes tests for cache management and citati
 ### Roadmap
 
 1. Model Diagnostics visualisation in Overview.
-2. Footer with credit line.
 
 ## Differences from Original DFR Browser
 
