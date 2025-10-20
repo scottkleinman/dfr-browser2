@@ -429,6 +429,7 @@ Four visualization modes for exploring all topics:
 - **Scaled**: 2D topic map using coordinates from `topic_coords.csv`
 - **List**: Table view with topic words and statistics
 - **Stacked**: Area chart showing topic proportions over time
+- **Diagnostics**: Statistics from MALLET's `diagnostics.xml` file if present
 
 ### Topic View
 
@@ -622,16 +623,25 @@ dist/
 │   ├── style.css                  # Main custom styles
 │   └── fonts/                     # Icon fonts
 ├── js/
-│   ├── main.js                    # Application entry point with routing
 │   ├── about.js                   # About page with markdown-it rendering
-│   ├── overview.js                # Overview view (Grid, Scaled, List, Stacked)
+│   ├── bibliography.js            # Bibliography with caching and sorting
+│   ├── cached-data-loader.js      # Functions for loading cached data
+│   ├── cache-manager.js           # Functions to manage cached data
+│   ├── citation.js                # Document citation view and export
+│   ├── d3.min.js                  # D3.js script
+│   ├── data-validator.js          # Ensure necessary files are present and valid
+│   ├── diagnostics.js             # Model diagnostics view
 │   ├── topic.js                   # Topic detail view
 │   ├── document.js                # Document detail view
-│   ├── word.js                    # Word analysis view
-│   ├── wordlist.js                # Word index view
-│   ├── bibliography.js            # Bibliography with caching and sorting
+│   ├── error-handler.js           # Error-handling functions
+│   ├── index.js                   # Main script for page.js
+│   ├── main.js                    # Application entry point with routing
+│   ├── markdown-it.min.js         # Markdown conversion code
+│   ├── overview.js                # Overview view (Grid, Scaled, List, Stacked)
 │   ├── state-utils.js             # MALLET state file parsing utilities
-│   ├── topic-config.js            # Topic customization (labels, hiding, mapping)
+│   ├── topic-config.js            # Topic customization (labels, hiding, │   │   ├── word.js                    # Word analysis view
+│   └── wordlist.js                # Word index view
+mapping)
 │   ├── cache-manager.js           # IndexedDB cache management
 │   ├── cached-data-loader.js      # Data loading with caching
 │   ├── data-validator.js          # Data validation utilities
@@ -683,7 +693,7 @@ Currently the `tests` folder only includes tests for cache management and citati
 
 ### Roadmap
 
-1. Model Diagnostics visualisation in Overview.
+1. Expand diagnostics features.
 
 ## Differences from Original DFR Browser
 
