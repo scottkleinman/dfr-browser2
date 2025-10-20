@@ -6,6 +6,7 @@ import { loadWordView } from './word.js';
 import { loadBibliography } from './bibliography.js';
 import { loadWordList } from './wordlist.js';
 import { loadAboutView } from './about.js';
+import { loadDiagnosticsView } from './diagnostics.js';
 import { renderCitationView } from './citation.js';
 import CacheManager from './cache-manager.js';
 import CachedDataLoader from './cached-data-loader.js';
@@ -866,6 +867,13 @@ function setupRoutes() {
     console.log('[DFR] Route: About');
     setActiveNav('/about');
     loadAboutView();
+  });
+
+  // Diagnostics route
+  window.page('/diagnostics', () => {
+    console.log('[DFR] Route: Diagnostics');
+    setActiveNav('/diagnostics');
+    loadDiagnosticsView();
   });
 
   // Settings route (modal, not a page)

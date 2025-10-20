@@ -1133,3 +1133,50 @@ th.sortable.sort-desc::after {
   font-size: 1.1em;
   vertical-align: middle;
 }
+
+/* ========================================
+   Diagnostics View
+   ======================================== */
+#topic-quality-chart {
+  background-color: var(--color-neutral-50);
+  border: 1px solid var(--color-neutral-300);
+  border-radius: 0.375rem;
+  padding: 1rem;
+}
+
+#topic-quality-chart svg {
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+}
+
+#topic-quality-chart .domain {
+  stroke: var(--color-neutral-400);
+}
+
+#topic-quality-chart .tick line {
+  stroke: var(--color-neutral-300);
+}
+
+#topic-quality-chart text {
+  fill: var(--color-neutral-700);
+}
+
+#diagnostics-table {
+  font-size: var(--text-sm);
+}
+
+#diagnostics-table th {
+  background-color: var(--color-neutral-100);
+  border-bottom: 2px solid var(--color-neutral-300);
+  font-weight: 600;
+}
+
+#diagnostics-table td {
+  vertical-align: middle;
+}
+
+.tooltip {
+  pointer-events: none;
+  z-index: 9999;
+  visibility: hidden;
+}

@@ -52,6 +52,7 @@ export async function loadOverview(topicKeys, docTopic, metadata, topicCoords, d
               <li class="nav-item"><a class="nav-link mode-link" href="#" id="mode-scaled">Scaled</a></li>
               <li class="nav-item"><a class="nav-link mode-link" href="#" id="mode-list">List</a></li>
               <li class="nav-item"><a class="nav-link mode-link" href="#" id="mode-stacked">Stacked</a></li>
+              <li class="nav-item"><a class="nav-link mode-link" href="/diagnostics">Diagnostics</a></li>
             </ul>
             <span class="navbar-text ms-auto" id="overview-navbar-message">Click a circle for more about a topic</span>
             <span id="conditional_view_help" class="navbar-text model_view_conditional" style="display:none; margin-left:1em;">y-axis:</span>
