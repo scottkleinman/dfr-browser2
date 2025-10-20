@@ -639,9 +639,9 @@ dist/
 │   ├── markdown-it.min.js         # Markdown conversion code
 │   ├── overview.js                # Overview view (Grid, Scaled, List, Stacked)
 │   ├── state-utils.js             # MALLET state file parsing utilities
-│   ├── topic-config.js            # Topic customization (labels, hiding, │   │   ├── word.js                    # Word analysis view
+│   ├── topic-config.js            # Topic customization (labels, hiding, metadata mapping)
+│   ├── word.js                    # Word analysis view
 │   └── wordlist.js                # Word index view
-mapping)
 │   ├── cache-manager.js           # IndexedDB cache management
 │   ├── cached-data-loader.js      # Data loading with caching
 │   ├── data-validator.js          # Data validation utilities
@@ -654,12 +654,14 @@ mapping)
 │   ├── prepare_dfr_data.py        # Data preparation script
 │   └── metadata_to_csl.py         # Metadata to CSL conversion
 └── data/                          # The files below would be added by the user
+    ├── docs.txt                   # File containing original data (optional)
     ├── topic-keys.txt             # MALLET topic-keys output
     ├── doc-topics.txt             # MALLET doc-topics output
     ├── doc-topic-counts.csv       # Document-topic count matrix
     ├── metadata.csv               # Document metadata
     ├── topic-state.gz             # MALLET topic state
     ├── topic_coords.csv           # Topic coordinates for scaled view
+    ├── diagnostics.xml            # MALLET diagnostics file (optional)
     └── bibliography.json          # CSL-formatted citations
 ```
 
