@@ -287,7 +287,7 @@ function renderDiagnosticsView() {
                 </thead>
                 <tbody>
                   ${diagnosticsData.topics.map(topic => `
-                    <tr>
+                    <tr onclick="window.page('/topic/${topic.id + 1}');">
                       <td>${getTopicLabel(topic.id)}</td>
                       <td>${topic.coherence.toFixed(3)}</td>
                       <td>${topic.exclusivity.toFixed(3)}</td>
