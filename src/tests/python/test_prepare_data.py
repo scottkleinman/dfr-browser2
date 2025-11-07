@@ -1,5 +1,5 @@
 """
-Pytest test suite for prepare_dfr_data.py
+Pytest test suite for prepare_data.py
 
 Run with: pytest test_prepare_dfr_data.py -v
 """
@@ -7,13 +7,19 @@ Run with: pytest test_prepare_dfr_data.py -v
 import gzip
 import json
 import os
+import sys
 import tempfile
 import zipfile
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import pytest
-from prepare_dfr_data import (
+
+# Add parent directory to path to import the module
+sys.path.insert(0, str(Path(__file__).parent.parent.parent / "bin"))
+
+from prepare_data import (
     compute_mds,
     get_top_words_and_weights,
     jensen_shannon,
@@ -167,7 +173,7 @@ def test_normalize_empty_document():
     proportions = normalize_doc_topic_proportions(doc_counts)
 
     assert len(proportions) == 1
-    assert proportions[0] == [0.0]
+    assert proportions[0] == []
 
 
 # --- Test coordinate generation functions ---

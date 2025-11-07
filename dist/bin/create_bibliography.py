@@ -1,12 +1,30 @@
-"""
-Metadata to JSON-CSL Converter
+"""create_bibliography.py.
 
-Reads metadata.csv and converts it to Citation Style Language (CSL) JSON format.
+Reads metadata.csv or CSL JSON and converts it to a file in Citation Style Language (CSL) JSON format.
 Each entry is formatted with citeproc-py and includes the formatted citation string.
 Outputs to bibliography.json in the same directory.
 
 Requirements:
-    pip install pandas python-dateutil nameparser citeproc-py
+  - pandas
+  - python-dateutil
+  - nameparser
+  - citeproc-py
+
+To use as a module:
+
+```python
+from create_bibliography import create_bibliography
+
+# From CSV
+create_bibliography(
+    "metadata.csv", "bibliography.json", "chicago-author-date", debug=False
+)
+
+# From existing CSL JSON (adds formatted citations)
+create_bibliography(
+    "bibliography.json", "bibliography_formatted.json", "apa", debug=False
+)
+```
 """
 
 import argparse
@@ -161,9 +179,9 @@ EXCLUDED_FIELDS = {
 }
 
 
-def parse_authors(author_string):
-    """
-    Parse author string into CSL author format.
+def parse_authors(author_string: str) -> list:
+    """Parse author string into CSL author format.
+
     Handles multiple authors separated by common delimiters.
 
     Args:
@@ -175,19 +193,67 @@ def parse_authors(author_string):
     if not author_string or pd.isna(author_string):
         return []
 
-    # Common separators for multiple authors
-    separators = [";", " and ", " & ", ",", "\n"]
+    author_string = author_string.strip()
 
-    # Try to split by separators
-    authors = [author_string.strip()]
-    for sep in separators:
-        new_authors = []
-        for author in authors:
-            if sep in author:
-                new_authors.extend([a.strip() for a in author.split(sep) if a.strip()])
+    # Detect the format and split accordingly
+    authors = []
+
+    # Common patterns for multiple authors
+    # Priority order: semicolons, " and ", " & ", then newlines
+    if ";" in author_string:
+        # Semicolon is unambiguous - always separates authors
+        authors = [a.strip() for a in author_string.split(";") if a.strip()]
+    elif " and " in author_string.lower():
+        # " and " separates authors
+        authors = [
+            a.strip()
+            for a in re.split(r"\s+and\s+", author_string, flags=re.IGNORECASE)
+            if a.strip()
+        ]
+    elif " & " in author_string:
+        # Ampersand separates authors
+        authors = [a.strip() for a in author_string.split(" & ") if a.strip()]
+    elif "\n" in author_string:
+        # Newlines separate authors
+        authors = [a.strip() for a in author_string.split("\n") if a.strip()]
+    else:
+        # No clear multi-author separator found
+        # Check if we have multiple commas (indicating "Last, First; Last, First" without semicolons)
+        comma_count = author_string.count(",")
+
+        if comma_count == 1:
+            # Single comma - likely "Last, First" format for one author
+            authors = [author_string]
+        elif comma_count > 1:
+            # Multiple commas - could be multiple "Last, First" authors separated by commas
+            # This is ambiguous, but we'll try to detect the pattern
+            # Look for ", " followed by a capital letter (likely a new last name)
+            # Pattern: "Smith, John, Jones, Mary" should split after "John," not after "Smith,"
+
+            # Try to split on comma followed by space and capital letter
+            # But preserve "Last, First" structure
+            potential_authors = re.split(r",\s+(?=[A-Z])", author_string)
+
+            # Check if we have pairs that look like "Last First" after splitting
+            if len(potential_authors) > 1 and all(
+                "," not in a for a in potential_authors[1:]
+            ):
+                # If none of the subsequent splits have commas, they're likely first names
+                # Recombine them as "Last, First" pairs
+                authors = []
+                for i in range(0, len(potential_authors), 2):
+                    if i + 1 < len(potential_authors):
+                        authors.append(
+                            f"{potential_authors[i]}, {potential_authors[i + 1]}"
+                        )
+                    else:
+                        authors.append(potential_authors[i])
             else:
-                new_authors.append(author)
-        authors = new_authors
+                # Can't determine pattern, treat as single author
+                authors = [author_string]
+        else:
+            # No commas - single author in "First Last" format
+            authors = [author_string]
 
     # Parse each author name
     parsed_authors = []
@@ -196,18 +262,20 @@ def parse_authors(author_string):
             continue
 
         try:
-            # Handle "Last, First" format
-            if "," in author and not author.count(",") > 2:
-                name = HumanName(author)
-            else:
-                # Handle "First Last" format
-                name = HumanName(author)
+            # Use HumanName parser which handles both "First Last" and "Last, First"
+            name = HumanName(author.strip())
 
             author_obj = {}
             if name.last and name.last.strip():
                 author_obj["family"] = name.last.strip()
             if name.first and name.first.strip():
                 author_obj["given"] = name.first.strip()
+            if name.middle and name.middle.strip():
+                # Add middle name to given name
+                if "given" in author_obj:
+                    author_obj["given"] = f"{author_obj['given']} {name.middle.strip()}"
+                else:
+                    author_obj["given"] = name.middle.strip()
             if name.suffix and name.suffix.strip():
                 author_obj["suffix"] = name.suffix.strip()
 
@@ -215,17 +283,17 @@ def parse_authors(author_string):
             if "family" in author_obj:
                 parsed_authors.append(author_obj)
             else:
-                parsed_authors.append({"literal": author})
+                # No family name found - use literal
+                parsed_authors.append({"literal": author.strip()})
         except Exception:
             # Fallback to literal name
-            parsed_authors.append({"literal": author})
+            parsed_authors.append({"literal": author.strip()})
 
     return parsed_authors
 
 
-def parse_date(date_string):
-    """
-    Parse date string into CSL date format.
+def parse_date(date_string: str) -> dict | None:
+    """Parse date string into CSL date format.
 
     Args:
         date_string (str): Date string in various formats
@@ -249,17 +317,26 @@ def parse_date(date_string):
         year_match = re.search(r"\b(\d{4})\b", str(date_string))
         if year_match:
             return {"date-parts": [[int(year_match.group(1))]]}
-        return None
+        elif date_string is not None:
+            return {"literal": date_string}
+        else:
+            return None
 
 
-def normalize_field_name(field_name):
-    """Normalize field names to lowercase and handle common variations."""
+def normalize_field_name(field_name: str) -> str:
+    """Normalize field names to lowercase and handle common variations.
+
+    Args:
+        field_name (str): Original field name
+
+    Returns:
+        str: Normalized field name
+    """
     return field_name.lower().strip().replace(" ", "").replace("_", "").replace("-", "")
 
 
-def validate_csl_entry(entry, debug=False):
-    """
-    Validate and clean a CSL entry to ensure it's properly formatted.
+def validate_csl_entry(entry: dict, debug: bool = False):
+    """Validate and clean a CSL entry to ensure it's properly formatted.
 
     Args:
         entry (dict): CSL entry to validate
@@ -331,9 +408,10 @@ def validate_csl_entry(entry, debug=False):
     return cleaned_entry
 
 
-def format_citation_with_citeproc(csl_entry, style="chicago-author-date", debug=False):
-    """
-    Format a single CSL entry as a citation using citeproc-py.
+def format_citation_with_citeproc(
+    csl_entry: dict, style: str = "chicago-author-date", debug: bool = False
+) -> str:
+    """Format a single CSL entry as a citation using citeproc-py.
 
     Args:
         csl_entry (dict): CSL entry to format
@@ -451,9 +529,12 @@ def format_citation_with_citeproc(csl_entry, style="chicago-author-date", debug=
 
         # Add year
         if "issued" in csl_entry and csl_entry["issued"]:
-            date_parts = csl_entry["issued"].get("date-parts", [])
-            if date_parts and len(date_parts[0]) > 0:
-                citation_parts.append(f"({date_parts[0][0]})")
+            if "date-parts" in csl_entry["issued"]:
+                date_parts = csl_entry["issued"]["date-parts"]
+                if date_parts and len(date_parts[0]) > 0:
+                    citation_parts.append(f"({date_parts[0][0]})")
+            elif "literal" in csl_entry["issued"]:
+                citation_parts.append(f"({csl_entry['issued']['literal']})")
 
         # Add title
         if "title" in csl_entry:
@@ -478,7 +559,9 @@ def format_citation_with_citeproc(csl_entry, style="chicago-author-date", debug=
         return None
 
 
-def convert_metadata_to_csl(metadata_file, style="chicago-author-date", debug=False):
+def convert_metadata_to_csl(
+    metadata_file: str, style: str = "chicago-author-date", debug: bool = False
+) -> list:
     """
     Convert metadata.csv to CSL JSON format with formatted citations.
 
@@ -562,16 +645,30 @@ def convert_metadata_to_csl(metadata_file, style="chicago-author-date", debug=Fa
                 # Validate the CSL entry
                 validated_entry = validate_csl_entry(entry, debug)
 
-                # Format citation with citeproc-py
-                formatted_citation = format_citation_with_citeproc(
-                    validated_entry, style, debug
-                )
+                # Check metadata for a formatted citation
+                if "formatted_citation" in entry:
+                    formatted_citation = entry["formatted_citation"]
+                # Format citation with citeproc-py if not in metadata
+                else:
+                    formatted_citation = format_citation_with_citeproc(
+                        validated_entry, style, debug
+                    )
                 if formatted_citation:
                     validated_entry["formatted-citation"] = formatted_citation
                 else:
                     failed_formatting += 1
+                    if validated_entry["author"] and validated_entry["author"] != "":
+                        validated_entry["formatted-citation"] = (
+                            f"{validated_entry['author']}. {validated_entry['year']}. <em>{validated_entry['title']}</em>."
+                        )
+                    else:
+                        validated_entry["formatted-citation"] = (
+                            f"<em>{validated_entry['title']}</em>. {validated_entry['year']}."
+                        )
                     if debug:
-                        print(f"Failed to format citation for entry {index + 1}")
+                        print(
+                            f"Failed to format citation for entry {index + 1}. Using fallback {validated_entry['formatted-citation']}."
+                        )
 
                 csl_entries.append(validated_entry)
 
@@ -600,32 +697,116 @@ def convert_metadata_to_csl(metadata_file, style="chicago-author-date", debug=Fa
         return None
 
 
-def main():
-    """Main function to handle command line arguments and run the conversion."""
-    parser = argparse.ArgumentParser(
-        description="Convert metadata.csv to JSON-CSL format with formatted citations"
-    )
-    parser.add_argument(
-        "--style",
-        default="chicago-author-date",
-        help="Citation style for formatting (default: chicago-author-date)",
-    )
-    parser.add_argument(
-        "--debug", action="store_true", help="Enable debug output for troubleshooting"
-    )
-    parser.add_argument(
-        "--input",
-        default="metadata.csv",
-        help="Input metadata CSV file (default: metadata.csv)",
-    )
-    parser.add_argument(
-        "--output",
-        default="bibliography.json",
-        help="Output JSON file (default: bibliography.json)",
-    )
+def process_csl_json(
+    input_file: str,
+    style: str = "chicago-author-date",
+    debug: bool = False,
+):
+    """Process existing CSL JSON file and add formatted citations.
 
-    args = parser.parse_args()
+    Args:
+        input_file (str): Path to input CSL JSON file
+        style (str): Citation style for formatting
+        debug (bool): Enable debug output
 
+    Returns:
+        list: List of CSL entries with formatted citations
+    """
+    try:
+        # Load existing CSL JSON
+        with open(input_file, "r", encoding="utf-8") as f:
+            csl_entries = json.load(f)
+
+        if not isinstance(csl_entries, list):
+            print(f"Error: Expected a JSON array, got {type(csl_entries).__name__}")
+            return None
+
+        print(f"Loaded {len(csl_entries)} CSL entries from {input_file}")
+
+        if debug:
+            print(f"Processing with citation style: {style}")
+
+        formatted_count = 0
+        failed_formatting = 0
+        already_formatted = 0
+
+        # Process each entry
+        for i, entry in enumerate(csl_entries, 1):
+            if debug and i % 100 == 0:
+                print(f"Processing entry {i}/{len(csl_entries)}...")
+
+            # Check if entry already has a formatted citation
+            if "formatted-citation" in entry:
+                already_formatted += 1
+                if debug:
+                    print(f"Entry {i} already has formatted citation, skipping")
+                continue
+
+            # Ensure entry has required fields
+            if "id" not in entry:
+                # Generate an ID if missing
+                entry["id"] = f"entry_{i}"
+
+            if "type" not in entry:
+                entry["type"] = "article"  # Default type
+
+            # Format citation
+            try:
+                formatted_citation = format_citation_with_citeproc(entry, style, debug)
+                if formatted_citation:
+                    entry["formatted-citation"] = formatted_citation
+                    formatted_count += 1
+                else:
+                    failed_formatting += 1
+                    if debug:
+                        print(
+                            f"Failed to format citation for entry {i}: {entry.get('id', 'unknown')}"
+                        )
+            except Exception as e:
+                failed_formatting += 1
+                if debug:
+                    print(f"Error formatting entry {i}: {e}")
+
+        # Print summary
+        print(f"Successfully processed {len(csl_entries)} entries")
+        if already_formatted > 0:
+            print(
+                f"Found {already_formatted} entries with existing formatted citations"
+            )
+        if formatted_count > 0:
+            print(
+                f"Successfully formatted {formatted_count} new citations using style '{style}'"
+            )
+        if failed_formatting > 0:
+            print(f"Warning: {failed_formatting} entries failed citation formatting")
+
+        return csl_entries
+
+    except FileNotFoundError:
+        print(f"Error: File '{input_file}' not found")
+        return None
+    except json.JSONDecodeError as e:
+        print(f"Error: Invalid JSON in '{input_file}': {e}")
+        return None
+    except Exception as e:
+        print(f"Error processing CSL JSON file: {e}")
+        return None
+
+
+def create_bibliography(
+    input: str = "metadata.csv",
+    output: str = "bibliography.json",
+    style: str = "chicago-author-date",
+    debug: bool = False,
+):
+    """Process the metadata.
+
+    Args:
+        input (str): Input metadata CSV or CSL JSON file
+        output (str): Output JSON file
+        style (str): Citation style for formatting
+        debug (bool): Enable debug output for troubleshooting
+    """
     # Map common style shortcuts to their full names
     style_mapping = {
         "chicago": "chicago-author-date",
@@ -636,22 +817,22 @@ def main():
     }
 
     # Apply style mapping if the user provided a shortcut
-    original_style = args.style
-    if args.style.lower() in style_mapping:
-        args.style = style_mapping[args.style.lower()]
-        if args.debug:
-            print(f"Mapped style '{original_style}' to '{args.style}'")
+    original_style = style
+    if style.lower() in style_mapping:
+        style = style_mapping[style.lower()]
+        if debug:
+            print(f"Mapped style '{original_style}' to '{style}'")
 
     # Get the directory of this script
     script_dir = Path(__file__).parent
 
     # Construct paths relative to script directory
-    metadata_file = script_dir / args.input
-    output_file = script_dir / args.output
+    input_file = script_dir / input
+    output_file = script_dir / output
 
-    # Check if metadata file exists
-    if not metadata_file.exists():
-        print(f"Error: Metadata file '{metadata_file}' not found")
+    # Check if input file exists
+    if not input_file.exists():
+        print(f"Error: Input file '{input_file}' not found")
         return
 
     # Check if citeproc-py is available
@@ -665,11 +846,18 @@ def main():
         )
         print("")
 
-    print(f"Converting {metadata_file} to CSL JSON format...")
-    print(f"Using citation style: {args.style}")
+    # Detect input file format
+    is_json_input = input_file.suffix.lower() == ".json"
 
-    # Convert metadata to CSL
-    csl_entries = convert_metadata_to_csl(str(metadata_file), args.style, args.debug)
+    if is_json_input:
+        print(f"Processing CSL JSON file: {input_file}")
+        print(f"Using citation style: {style}")
+        csl_entries = process_csl_json(str(input_file), style, debug)
+    else:
+        print(f"Converting {input_file} to CSL JSON format...")
+        print(f"Using citation style: {style}")
+        # Convert metadata to CSL
+        csl_entries = convert_metadata_to_csl(str(input_file), style, debug)
 
     if not csl_entries:
         print("Error: No entries were converted. Exiting.")
@@ -688,7 +876,7 @@ def main():
 
         if CITEPROC_AVAILABLE:
             print(
-                f"Successfully formatted {formatted_count} citations using style '{args.style}'"
+                f"Successfully formatted {formatted_count} citations using style '{style}'"
             )
             if formatted_count == 0:
                 print(
@@ -700,13 +888,41 @@ def main():
                 "CSL JSON entries were created successfully but without formatted citation strings."
             )
 
-        if args.debug and csl_entries:
+        if debug and csl_entries:
             print("\n=== Sample entry ===")
             sample = csl_entries[0]
             print(json.dumps(sample, indent=2, ensure_ascii=False))
 
     except Exception as e:
         print(f"Error saving to {output_file}: {e}")
+
+
+def main():
+    """Main function to handle command line arguments and run the conversion."""
+    parser = argparse.ArgumentParser(
+        description="Convert metadata CSV or CSL JSON to formatted bibliography with citations"
+    )
+    parser.add_argument(
+        "--style",
+        default="chicago-author-date",
+        help="Citation style for formatting (default: chicago-author-date)",
+    )
+    parser.add_argument(
+        "--debug", action="store_true", help="Enable debug output for troubleshooting"
+    )
+    parser.add_argument(
+        "--input",
+        default="metadata.csv",
+        help="Input file: metadata CSV or CSL JSON (default: metadata.csv)",
+    )
+    parser.add_argument(
+        "--output",
+        default="bibliography.json",
+        help="Output JSON file (default: bibliography.json)",
+    )
+
+    args = parser.parse_args()
+    create_bibliography(args.input, args.output, args.style, args.debug)
 
 
 if __name__ == "__main__":

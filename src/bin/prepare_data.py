@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""
+"""prepare_data.py.
+
 Comprehensive MALLET topic-state file processor for dfr-browser.
 
 Processes a MALLET topic-state.gz file and generates all necessary files for dfr-browser:
@@ -7,9 +8,18 @@ Processes a MALLET topic-state.gz file and generates all necessary files for dfr
 - topic-keys.txt (topic words for browser)
 - doc-topic.txt (normalized proportions for browser)
 - topic_coords.csv (2D topic coordinates for browser)
-- tw.json (topic-words JSON for advanced features)
-- dt.zip (sparse doc-topic matrix for advanced features)
+- tw.json (topic-words JSON for advanced features and dfr-browser compatibility)
+- dt.zip (sparse doc-topic matrix for advanced features and dfr-browser compatibility)
 - metadata.csv (basic document metadata if not exists)
+
+
+To use as a module, call
+
+```python
+from prepare_data import process_mallet_state_file
+
+process_mallet_state_file(statefile, output_dir, top_words, generate_all=False)
+```
 """
 
 import argparse
@@ -17,6 +27,7 @@ import csv
 import gzip
 import json
 import os
+import warnings
 import zipfile as zf
 from collections import defaultdict
 
@@ -96,9 +107,23 @@ def compute_mds(dist: np.ndarray, n_components: int = 2) -> np.ndarray:
 
     Returns:
         np.ndarray: MDS coordinates (num_topics x n_components)
+
+    # NOTE:
+    When all topics are identical or very similar, the Jensen-Shannon distance matrix will have very small or zero distances. Division by zero/near-zero triggers a RuntimeWarning in sklearn's MDS implementation. This may be caused by not enough documents to create distinct topics, by the model creating redundant/similar topics, by poor model quality, or by homogeneous data in which documents are too similar. This function will calculate coordinates anyway, so we suppress the warning.
     """
-    mds = MDS(n_components=n_components, dissimilarity="precomputed", random_state=42)
-    coords = mds.fit_transform(dist)
+    # Suppress the specific RuntimeWarning from sklearn
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", category=RuntimeWarning)
+
+        mds = MDS(
+            n_components=n_components,
+            dissimilarity="precomputed",
+            random_state=42,
+            n_init=4,
+            max_iter=300,
+        )
+        coords = mds.fit_transform(dist)
+
     return coords
 
 

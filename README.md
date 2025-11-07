@@ -80,6 +80,8 @@ Next open your browser and navigate to `http://localhost:8000` (or whatever port
 
 It is recommended that you deposit all data and metadata files that will be accessed by the app in the `data` folder for easy location. However, you may point to other locations or or upload the files from within the app, depending on your configuration. This will be discussed below.
 
+Fuller documentation on how to prepare your data for DFR Browser 2 can be found in  `bin/PREPARE_DATA.md`.
+
 ### Required Files
 
 #### 1. Topic Keys File (`topic-keys.txt`)
@@ -120,7 +122,7 @@ User-generated CSV file with document metadata.
 - `title` - Document title
 - `year` - Publication year
 
-You may have an arbitrary number of additional fields. If you have fields that match [CSL-JSON](https://citeproc-js.readthedocs.io/en/latest/csl-json/markup.html) properties, you will be able to use the metadata to generate well-formatted bibliographies using the `bin/metadata_to_csl.py` script.
+You may have an arbitrary number of additional fields. If you have fields that match [CSL-JSON](https://citeproc-js.readthedocs.io/en/latest/csl-json/markup.html) properties, you will be able to use the metadata to generate well-formatted bibliographies using the `bin/create_bibliography.py` script.
 
 **Example:**
 
@@ -156,7 +158,7 @@ topic,x,y
 1,0.2,0.8
 ```
 
-The `topic_coords.csv` file may be generated from the MALLET state file using the `bin/prepare_dfr_data.py` script.
+The `topic_coords.csv` file may be generated from the MALLET state file using the `bin/prepare_data.py` script.
 
 #### 2. Bibliography File (`bibliography.json`)
 
@@ -166,8 +168,12 @@ If provided, this file is used instead of generating citations from the `metadat
 
 **Important:**
 
-- The `bibliography.json` file should be generated using the `bin/metadata_to_csl.py` script, which adds a `formatted_citation` field that contains a string representation of each entry. This is used to display the entries within the app. The individual citation fields are only used for sorting purposes.
+- The `bibliography.json` file should be generated using the `bin/create_bibliography.py` script, which adds a `formatted_citation` field that contains a string representation of each entry. This is used to display the entries within the app. The individual citation fields are only used for sorting purposes.
 - The `bibliography.json` file cannot currently be uploaded via the UI; the path must be specified in `config.json`. See the discussion of Configuration below.
+
+If you already have a JSON CSL-formatted bibliography that does not contain a `formatted_citation` field, you can use the `create_bibliography.py` script to add formatted citations based on your existing bibliography fields.
+
+For full documentation on using the `create_bibliography.py`, see `bin/CREATE_BIBLIOGRAPHY.md`.
 
 #### 3. Source Text File
 
@@ -651,8 +657,8 @@ dist/
 │   ├── index.js                   # Page.js routing library
 │   └── markdown-it.min.js         # Markdown parser for About page
 ├── bin/
-│   ├── prepare_dfr_data.py        # Data preparation script
-│   └── metadata_to_csl.py         # Metadata to CSL conversion
+│   ├── prepare_data.py           # Data preparation script
+│   └── create_bibliography.py     # Metadata to CSL conversion
 └── data/                          # The files below would be added by the user
     ├── docs.txt                   # File containing original data (optional)
     ├── topic-keys.txt             # MALLET topic-keys output
