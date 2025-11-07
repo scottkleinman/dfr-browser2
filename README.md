@@ -727,6 +727,11 @@ Use the GitHub Issues to open a ticket.
 
 ## Changelog
 
+### Version 0.2.4
+
+- Updates, docs, and tests for Python scripts.
+- CSL JSON files are not accepted as input by `create_bibliography.py.`
+
 ### Version 0.2.3
 
 - First public release on GitHub.
