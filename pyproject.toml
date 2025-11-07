@@ -1,7 +1,7 @@
 [project]
-name = "dfr-browser2"
-version = "0.1.0"
-description = "Add your description here"
+name = "DFR Browser 2"
+version = "0.2.4"
+description = "A re-engineered version of Andrew Goldstone's dfr-browser with new features."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
