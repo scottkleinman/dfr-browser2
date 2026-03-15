@@ -68,7 +68,6 @@ async function loadConfig() {
     if (response.ok) {
       bibliographyData = await response.json();
       // Add _docIndex to each entry if not present (same as bibliography.js does)
-      alert(JSON.stringify(bibliographyData[0]))
       bibliographyData.forEach((doc, index) => {
         if (doc._docIndex === undefined) {
           doc._docIndex = index;
