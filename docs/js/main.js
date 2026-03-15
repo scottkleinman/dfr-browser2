@@ -132,7 +132,7 @@ async function init() {
 
   // Load configuration with error handling
   try {
-    const response = await fetch('/config.json');
+    const response = await fetch('config.json');
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
