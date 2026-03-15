@@ -74,11 +74,7 @@ Next open your browser and navigate to `http://localhost:8000` (or whatever port
 
 **Notes:**
 
-<<<<<<< HEAD
-1. Dfr Browser 2 requires Single Page Application (SPA) routing behaviour, and the methods above ensure that this is implemented. If you wish to serve or host the application by some other means, you may have to play with your server configuration. See **Deployment** below.
-=======
 1. Dfr Browser 2 requires Single Page Application (SPA) routing behaviour, and the methods above ensure that this is implemented. If you wish to serve or host the application by some other means, you may have to play with your server configuration. See [Deployment](#deployment) below.
->>>>>>> 3a75f5f (Update README)
 2. Although your app will be served on a localhost, internet access is still recommended because the app currently downloads Google fonts. Without internet access, the fallback font may negatively impact the display.
 
 ## File Requirements
@@ -613,11 +609,7 @@ Currently tested only on Chrome and Firefox.
 
 ### Known Issues
 
-<<<<<<< HEAD
-- The application must be served using the built-in `serve.py` in order for the routing to work correctly. See **Deployment** below.
-=======
 - The application must be served using the built-in `serve.py` in order for the routing to work correctly. See [Deployment](#deployment) below.
->>>>>>> 3a75f5f (Update README)
 - Large datasets can take a long time to load. Once they are loaded and cached, page loading is fast.
 - The Python data preparation scripts in the `bin` directory are not yet ready for primetime (as of v0.2.5). Use with caution.
 
