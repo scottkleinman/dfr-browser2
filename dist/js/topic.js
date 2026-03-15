@@ -198,7 +198,7 @@ function generateWordDistributionHTML(topicWords, topicNumber, settings = {}) {
     html += `
       <tr>
         <td>
-          <a href="/word/${encodeURIComponent(word)}" class="fw-bold text-primary word-link" title="Click to view word details">
+          <a href="word/${encodeURIComponent(word)}" class="fw-bold text-primary word-link" title="Click to view word details">
             ${word}
           </a>
         </td>
