@@ -1,0 +1,108 @@
+{
+  "application": {
+    "name": "DFR Browser 2",
+    "version": "0.2.3",
+    "lastUpdated": "2025-10-16"
+  },
+  "brand": {
+    "name": "DFR Browser 2",
+    "url": "#",
+    "logo": null,
+    "favicon": "/assets/favicon-16x16.png"
+  },
+  "embargo": true,
+  "data_source": "data/docs.txt",
+  "topic_keys_file": "data/topic-keys.txt",
+  "doc_topic_file": "data/doc-topic.txt",
+  "metadata_file": "data/metadata.csv",
+  "topic_state_file": "data/topic-state.gz",
+  "topic_coords_file": "data/topic_coords.csv",
+  "show_upload_form": false,
+  "bibliography": {
+    "path": "data/bibliography.json",
+    "style": "chicago",
+    "locale": "en-GB"
+  },
+  "language": {
+    "default": "en",
+    "configs": {
+      "en": {
+        "name": "English",
+        "alphabet": ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"],
+        "locale": "en-GB"
+      },
+      "es": {
+        "name": "Español",
+        "alphabet": ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "Ñ", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"],
+        "locale": "es-ES"
+      },
+      "fr": {
+        "name": "Français",
+        "alphabet": ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"],
+        "locale": "fr-FR"
+      },
+      "de": {
+        "name": "Deutsch",
+        "alphabet": ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "Ä", "Ö", "Ü", "ß"],
+        "locale": "de-DE"
+      },
+      "it": {
+        "name": "Italiano",
+        "alphabet": ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"],
+        "locale": "it-IT"
+      },
+      "pt": {
+        "name": "Português",
+        "alphabet": ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "À", "Á", "Â", "Ã", "Ç", "É", "Ê", "Í", "Ó", "Ô", "Õ", "Ú"],
+        "locale": "pt-BR"
+      },
+      "ru": {
+        "name": "Русский",
+        "alphabet": ["А", "Б", "В", "Г", "Д", "Е", "Ё", "Ж", "З", "И", "Й", "К", "Л", "М", "Н", "О", "П", "Р", "С", "Т", "У", "Ф", "Х", "Ц", "Ч", "Ш", "Щ", "Ъ", "Ы", "Ь", "Э", "Ю", "Я"],
+        "locale": "ru-RU"
+      },
+      "zh": {
+        "name": "中文",
+        "alphabet": [],
+        "locale": "zh-CN",
+        "useRadicals": true
+      },
+      "ja": {
+        "name": "日本語",
+        "alphabet": ["あ", "い", "う", "え", "お", "か", "き", "く", "け", "こ", "さ", "し", "す", "せ", "そ", "た", "ち", "つ", "て", "と", "な", "に", "ぬ", "ね", "の", "は", "ひ", "ふ", "へ", "ほ", "ま", "み", "む", "め", "も", "や", "ゆ", "よ", "ら", "り", "る", "れ", "ろ", "わ", "を", "ん"],
+        "locale": "ja-JP"
+      },
+      "ar": {
+        "name": "العربية",
+        "alphabet": ["ا", "ب", "ت", "ث", "ج", "ح", "خ", "د", "ذ", "ر", "ز", "س", "ش", "ص", "ض", "ط", "ظ", "ع", "غ", "ف", "ق", "ك", "ل", "م", "ن", "ه", "و", "ي"],
+        "locale": "ar-SA",
+        "rtl": true
+      }
+    }
+  },
+  "display": {
+    "theme": "light",
+    "itemsPerPage": 50,
+    "showWordCounts": true
+  },
+  "settings": {
+    "defaults": {
+      "showHiddenTopics": false,
+      "wordsInLists": 15,
+      "wordsInTopic": 50,
+      "wordsInCircles": 6,
+      "topicDocs": 20
+    }
+  },
+  "topics": {
+    "labels": {},
+    "hidden": []
+  },
+  "metadata": {
+    "fieldMappings": {}
+  },
+  "about": {
+    "title": "About DFR Browser 2",
+    "content": "This is a temporary demo using Alan Liu's <a href=\"https://alanyliu.org/citation/kit-for-exploring-articles-on-ai-published-in-2024/\" target=\"_blank\">Kit for Exploring AI</a>. More info will be added soon."
+  }
+}
