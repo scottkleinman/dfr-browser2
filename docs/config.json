@@ -1,14 +1,14 @@
 {
   "application": {
     "name": "DFR Browser 2",
-    "version": "0.2.3",
-    "lastUpdated": "2025-10-16"
+    "version": "0.2.5",
+    "lastUpdated": "2026-03-15"
   },
   "brand": {
     "name": "DFR Browser 2",
     "url": "#",
     "logo": null,
-    "favicon": "/assets/favicon-16x16.png"
+    "favicon": "assets/favicon-16x16.png"
   },
   "embargo": true,
   "data_source": "data/docs.txt",
@@ -17,11 +17,12 @@
   "metadata_file": "data/metadata.csv",
   "topic_state_file": "data/topic-state.gz",
   "topic_coords_file": "data/topic_coords.csv",
+  "diagnostics_file": "data/diagnostics.xml",
   "show_upload_form": false,
   "bibliography": {
     "path": "data/bibliography.json",
     "style": "chicago",
-    "locale": "en-GB"
+    "locale": "en-US"
   },
   "language": {
     "default": "en",
@@ -103,6 +104,6 @@
   },
   "about": {
     "title": "About DFR Browser 2",
-    "content": "This is a temporary demo using Alan Liu's <a href=\"https://alanyliu.org/citation/kit-for-exploring-articles-on-ai-published-in-2024/\" target=\"_blank\">Kit for Exploring AI</a>. More info will be added soon."
+    "content": "<a href=\"https://github.com/scottkleinman/dfr-browser2\" target=\"_blank\">DFR Browser 2</a> is an interactive web application for exploring topic models and document collections. It is based on the original <a href=\"https://agoldst.github.io/dfr-browser/\" target=\"_blank\">DFR Browser</a> created by Andrew Goldstone. However, it has been re-engineered from the ground up with new features. This demo model is derived from Alan Liu's <a href=\"https://alanyliu.org/citation/kit-for-exploring-articles-on-ai-published-in-2024/\" target=\"_blank\">AI Toolkit</a>. More info will be added soon."
   }
 }
