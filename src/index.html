@@ -1,6 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script>
+    (function () {
+      var p = window.location.pathname;
+      var routes = ['/topic', '/document', '/word', '/bibliography', '/wordlist', '/about', '/settings', '/diagnostics'];
+      var root = p;
+      for (var i = 0; i < routes.length; i++) {
+        var idx = p.indexOf(routes[i]);
+        if (idx >= 0) { root = p.slice(0, idx + 1); break; }
+      }
+      if (!root.endsWith('/')) root += '/';
+      var b = document.createElement('base');
+      b.href = root;
+      document.head.insertBefore(b, document.head.firstChild);
+      window.dfrBasePath = root === '/' ? '' : root.replace(/\/$/, '');
+    }());
+  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DFR Browser 2</title>
@@ -9,12 +25,12 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
   <!-- Bootstrap CSS -->
-  <link href="/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="/css/bootstrap-icons.css">
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/bootstrap-icons.css">
   <!-- Custom CSS -->
-  <link href="/css/style.css" rel="stylesheet">
+  <link href="css/style.css" rel="stylesheet">
   <!-- Favicon (default, can be overridden by config) -->
-  <link id="favicon" rel="icon" type="image/png" href="/assets/favicon-16x16.png">
+  <link id="favicon" rel="icon" type="image/png" href="assets/favicon-16x16.png">
 </head>
 <body>
   <!-- Hidden data upload form for manual file loading -->
@@ -71,13 +87,13 @@
   <!-- Navigation Bar -->
   <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4" role="navigation" aria-label="Main Navigation">
     <div class="container">
-  <a class="navbar-brand" href="/" id="brand-link" aria-label="DFR Browser 2 Home">DFR Browser 2</a>
+  <a class="navbar-brand" href="#" data-route="/" id="brand-link" aria-label="DFR Browser 2 Home">DFR Browser 2</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
   <ul class="navbar-nav" role="menubar" aria-label="Primary Navigation">
-          <li class="nav-item"><a class="nav-link" href="/" aria-label="Overview" role="menuitem">Overview</a></li>
+          <li class="nav-item"><a class="nav-link" href="#" data-route="/" aria-label="Overview" role="menuitem">Overview</a></li>
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="topicDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Topic Menu" aria-controls="topicDropdownMenu">
               Topic
@@ -86,14 +102,14 @@
               <li><a class="dropdown-item" href="#" aria-label="No topics loaded" role="menuitem">No topics loaded</a></li>
             </ul>
           </li>
-          <li class="nav-item"><a class="nav-link" href="/document" aria-label="Document View" role="menuitem">Document</a></li>
-          <li class="nav-item"><a class="nav-link" href="/word" aria-label="Word View" role="menuitem">Word</a></li>
-          <li class="nav-item"><a class="nav-link" href="/bibliography" aria-label="Bibliography View" role="menuitem">Bibliography</a></li>
-          <li class="nav-item"><a class="nav-link" href="/wordlist" aria-label="Word Index View" role="menuitem">Word Index</a></li>
+          <li class="nav-item"><a class="nav-link" href="#" data-route="/document" aria-label="Document View" role="menuitem">Document</a></li>
+          <li class="nav-item"><a class="nav-link" href="#" data-route="/word" aria-label="Word View" role="menuitem">Word</a></li>
+          <li class="nav-item"><a class="nav-link" href="#" data-route="/bibliography" aria-label="Bibliography View" role="menuitem">Bibliography</a></li>
+          <li class="nav-item"><a class="nav-link" href="#" data-route="/wordlist" aria-label="Word Index View" role="menuitem">Word Index</a></li>
         </ul>
         <ul class="navbar-nav ms-auto" role="menubar" aria-label="Secondary Navigation">
           <li class="nav-item"><a class="nav-link" href="#" id="settings-link" aria-label="Settings Modal" role="menuitem">Settings</a></li>
-          <li class="nav-item"><a class="nav-link" href="/about" aria-label="About Page" role="menuitem">About</a></li>
+          <li class="nav-item"><a class="nav-link" href="#" data-route="/about" aria-label="About Page" role="menuitem">About</a></li>
         </ul>
       </div>
     </div>
@@ -123,14 +139,14 @@
   </footer>
 
   <!-- Bootstrap JS -->
-  <script src="/js/bootstrap.bundle.min.js"></script>
+  <script src="js/bootstrap.bundle.min.js"></script>
   <!-- D3.js -->
-  <script src="/js/d3.min.js"></script>
+  <script src="js/d3.min.js"></script>
   <!-- Markdown-it -->
-  <script src="/js/markdown-it.min.js"></script>
+  <script src="js/markdown-it.min.js"></script>
   <!-- Page.js Router -->
-  <script src="/js/index.js"></script>
+  <script src="js/index.js"></script>
   <!-- Main JS -->
-  <script type="module" src="/js/main.js"></script>
+  <script type="module" src="js/main.js"></script>
 </body>
 </html>

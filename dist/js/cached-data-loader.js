@@ -205,7 +205,7 @@ const CachedDataLoader = {
     // Get state file info from config
     let stateFileUrl = 'sample_data/topic-state.gz';
     try {
-      const response = await fetch('/config.json');
+      const response = await fetch('config.json');
       const config = await response.json();
       stateFileUrl = config.topic_state_file || stateFileUrl;
     } catch (err) {

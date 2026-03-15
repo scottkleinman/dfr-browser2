@@ -370,11 +370,23 @@ def process_mallet_state_file(
             if line_count % 100000 == 0:
                 print(f"Processed {line_count:,} tokens...")
 
+            # parts = line.strip().split()
+            # if len(parts) < 6:
+            #     continue
+
+            # doc_idx, source, pos, type_index, word, topic = parts
+            # Parse from the right, because the last fields (pos, type_index, word, topic) are always the “stable” ones:
             parts = line.strip().split()
             if len(parts) < 6:
                 continue
 
-            doc_idx, source, pos, type_index, word, topic = parts
+            doc_idx = int(parts[0])
+            topic = int(parts[-1])
+            word = parts[-2]
+            type_index = int(parts[-3])
+            pos = int(parts[-4])
+            source = " ".join(parts[1:-4])
+
             doc_idx = int(doc_idx)
             type_index = int(type_index)
             topic = int(topic)

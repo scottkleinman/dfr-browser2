@@ -6,12 +6,12 @@ await window.bibliographyCache.clear()   // Clear cache
 await window.bibliographyCache.reload()  // Clear and reload from network
 */
 
-// Helper function to ensure paths are absolute
+// Helper function to ensure paths work on any sub-path deployment
 function ensureAbsolutePath(path) {
   if (!path) return path;
-  if (path.startsWith('/')) return path;
   if (path.startsWith('http://') || path.startsWith('https://')) return path;
-  return '/' + path;
+  if (path.startsWith('/')) return (window.dfrBasePath || '') + path;
+  return path;
 }
 
 // Global configuration object
@@ -21,7 +21,7 @@ let bibliographyData = null;
 // Load application configuration
 async function loadConfig() {
   try {
-    const response = await fetch('/config.json');
+    const response = await fetch('config.json');
     appConfig = await response.json();
     return appConfig;
   } catch (error) {

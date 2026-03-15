@@ -1,4 +1,4 @@
-"""dfr_browser_module.
+"""dfr_browser_module.py.
 
 Python module to automatically set up and serve a dfr-browser instance. This is the basis for a command line tool `dfr-browser`, but also for a Python module that can be integrated into Lexos. The implementation is incomplete.
 
@@ -14,6 +14,11 @@ or from command line:
 $ python dfr_browser_module.py statefile.gz metadata.csv output_dir template.html --host localhost --port 8000
 
 Further modifications can be made to the configuration by editing the config.json file directly. Likewise, a bibliography file can be added by placing it in the data directory and updating the config.json file.
+
+# TODO: Check if this is the best way to serve the browser, or if the original module is better.
+# TODO: Find a way to add bibliography or modify config from the command line?
+# TODO: For Lexos, add Pydantic.
+# TODO: Needs a check that inputs are valid. Should prepare_data be imported and run automatically?
 """
 
 import argparse
@@ -116,6 +121,34 @@ class DfrBrowser(BaseModel):
             print(f"Serving at http://{host}:{port}")
             webbrowser.open(f"http://{host}:{port}")
             httpd.serve_forever()
+
+    # Version from Lexos
+    # def serve(self, port: Optional[int] = None) -> None:
+    #     """Launch the dfr-browser.
+
+    #     Args:
+    #         port (int): The port to run the browser on.
+    #     """
+    #     if port:
+    #         self.port = port
+
+    #     directory = Path(self.path_to_browser_dir)
+    #     self.handler = partial(SimpleHTTPRequestHandler, directory=directory)
+    #     try:
+    #         thread = threading.Thread(target=self._serve_forever)
+    #         thread.daemon = True  # Let the parent kill the child thread at exit
+    #         thread.start()
+    #         print(f"Serving Dfr-Browser from {directory}.")
+    #         print(
+    #             "Type Ctrl-C to stop the server. If you are serving from a notebook, interrupt the kernel."
+    #         )
+    #         time.sleep(2)
+    #         webbrowser.open(f"http://127.0.0.1:{self.port}/")
+    #         while thread.is_alive():
+    #             thread.join(1)  # time out not to block KeyboardInterrupt
+    #     except KeyboardInterrupt:
+    #         print("Server interrupted.")
+    #         sys.exit(1)
 
 
 if __name__ == "__main__":

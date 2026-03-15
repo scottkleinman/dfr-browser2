@@ -73,7 +73,7 @@ Next open your browser and navigate to `http://localhost:8000` (or whatever port
 
 **Notes:**
 
-1. Dfr Browser 2 requires Single Page Application (SPA) routing behaviour, and the methods above ensure that this is implemented. If you wish to serve or host the application by some other means, you may have to play with your server configuration. Support for more serving/hosting methods is planned for the future.
+1. Dfr Browser 2 requires Single Page Application (SPA) routing behaviour, and the methods above ensure that this is implemented. If you wish to serve or host the application by some other means, you may have to play with your server configuration. See **Deployment** below.
 2. Although your app will be served on a localhost, internet access is still recommended because the app currently downloads Google fonts. Without internet access, the fallback font may negatively impact the display.
 
 ## File Requirements
@@ -203,7 +203,7 @@ The application settings should be left alone, as they identify the version of t
 {
   "application": {
     "name": "DFR Browser 2",
-    "version": "2.0.0"
+    "version": "0.2.5"
   }
 }
 ```
@@ -238,7 +238,8 @@ External URLs open in a new tab. The page title automatically updates to match t
   "doc_topic_file": "data/doc-topic.txt",
   "metadata_file": "data/metadata.csv",
   "topic_state_file": "data/topic-state.gz",
-  "topic_coords_file": "data/topic_coords.csv"
+  "topic_coords_file": "data/topic_coords.csv",
+  "diagnostics_file": "data/diagnostics.xml"
 }
 ```
 
@@ -607,9 +608,21 @@ Currently tested only on Chrome and Firefox.
 
 ### Known Issues
 
-- The application must be served using the built-in `serve.py` in order for the routing to work correctly. Support for serving the app by other means and for hosting the app on a public server will be added soon.
+- The application must be served using the built-in `serve.py` in order for the routing to work correctly. See **Deployment** below.
 - Large datasets can take a long time to load. Once they are loaded and cached, page loading is fast.
-- The Python data preparation scripts in the `bin` directory are not yet ready for primetime (as of v0.2.3). Use with caution.
+- The Python data preparation scripts in the `bin` directory are not yet ready for primetime (as of v0.2.5). Use with caution.
+
+## Deployment
+
+As of v0.2.5, it should be possible to upload the app files directly to an Apache server, and they should run out of the box. Note that you must have the `.htaccess` file in the app's root folder.
+
+In some cases, the `.htaccess` file may be intercepted by another `.htaccess` file in your domain's root. For instance, if you have WordPress installed, its `.htaccess` file will probably take precedence over DFR Browser 2's `.htaccess` file, which will never be run. A possible (untested) solution is to deploy DFR Browser 2 outside `wp-content/` in a sibling directory at the domain root. This would only be subject to WordPress's root rewrite rules, which you can add an exception to:
+
+```apache
+RewriteCond %{REQUEST_URI} !^/dfr-browser/ [NC]
+```
+
+Support for more serving/hosting methods is planned for the future.
 
 ## Development
 
@@ -715,7 +728,7 @@ New styling provides a fresh look and easier customization potential. In some ca
 
 Based on [dfr-browser](https://github.com/agoldst/dfr-browser) by Andrew Goldstone.
 
-This project began as a test case for using <a href="https://github.com/github/spec-kit" target="_blank">GitHub Spec-Kit</a>. Most of the code and document generation was done in collaboratio with Claude Sonnet 4 or Claude Sonnet 4.5.
+This project began as a test case for using <a href="https://github.com/github/spec-kit" target="_blank">GitHub Spec-Kit</a>. Most of the code and document generation was done in collaboration with various versions of Claude Sonnet 4+.
 
 ## Licence
 
@@ -727,10 +740,14 @@ Use the GitHub Issues to open a ticket.
 
 ## Changelog
 
+### Version 0.2.5
+
+- Refactor to allow deployment on remote servers.
+
 ### Version 0.2.4
 
 - Updates, docs, and tests for Python scripts.
-- CSL JSON files are not accepted as input by `create_bibliography.py.`
+- CSL JSON files are now accepted as input by `create_bibliography.py.`
 
 ### Version 0.2.3
 

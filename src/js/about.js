@@ -42,7 +42,7 @@ Topic modeling is a method for finding abstract "topics" that occur in a collect
         ` : ''}
 
         <div class="mt-4">
-          <a href="/" class="btn btn-secondary">Back to Overview</a>
+          <a href="${window.dfrBasePath || '/'}" class="btn btn-secondary">Back to Overview</a>
         </div>
       </div>
     </div>

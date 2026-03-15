@@ -107,6 +107,14 @@ function parseMetadata(text) {
   });
 }
 
+// Rewrite data-route nav links to use correct base path
+function updateNavLinks() {
+  const base = window.dfrBasePath || '';
+  document.querySelectorAll('[data-route]').forEach(el => {
+    el.href = base + el.dataset.route;
+  });
+}
+
 // Initialize the application
 async function init() {
   console.log('[DFR] Initializing application...');
@@ -134,7 +142,7 @@ async function init() {
 
   // Load configuration with error handling
   try {
-    const response = await fetch('/config.json');
+    const response = await fetch('config.json');
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
@@ -191,7 +199,10 @@ async function init() {
 
   // Configure router WITHOUT hashbang mode (use HTML5 history)
   console.log('[DFR] Configuring router with HTML5 history mode...');
-  window.page.base('');
+  window.page.base(window.dfrBasePath || '');
+
+  // Rewrite nav hrefs to use the correct base path
+  updateNavLinks();
 
 
 
@@ -325,7 +336,7 @@ async function ensureDataLoaded() {
   if (!window.dfrState.config) {
     // Load config first if not already loaded
     try {
-      const response = await fetch('/config.json');
+      const response = await fetch('config.json');
       window.dfrState.config = await response.json();
       console.log('[DFR] Config loaded for auto-load');
     } catch (error) {
@@ -380,7 +391,7 @@ async function populateTopicDropdown(topicKeys) {
     const li = document.createElement('li');
     const a = document.createElement('a');
     a.className = 'dropdown-item';
-    a.href = `/topic/${topicNum}`; // Use 1-based numbering in URL
+    a.href = (window.dfrBasePath || '') + `/topic/${topicNum}`; // Use 1-based numbering in URL
     a.textContent = menuText;
 
     li.appendChild(a);
@@ -401,15 +412,13 @@ function getVisibleTopicIndices() {
 }
 }
 
-// Helper function to ensure paths are absolute
+// Helper function to ensure paths work on any sub-path deployment
 function ensureAbsolutePath(path) {
   if (!path) return path;
-  // If path already starts with /, it's absolute
-  if (path.startsWith('/')) return path;
-  // If path starts with http:// or https://, it's already absolute
   if (path.startsWith('http://') || path.startsWith('https://')) return path;
-  // Otherwise, make it absolute by prepending /
-  return '/' + path;
+  // Legacy absolute paths get the base prepended; relative paths resolve via <base> tag
+  if (path.startsWith('/')) return (window.dfrBasePath || '') + path;
+  return path;
 }
 
 // Auto-load files from config paths
@@ -905,7 +914,7 @@ function setActiveNav(path) {
   });
 
   // Add active class to matching link
-  const navLink = document.querySelector(`.nav-link[href="${path}"]`);
+  const navLink = document.querySelector(`.nav-link[data-route="${path}"]`);
   if (navLink) {
     navLink.classList.add('active');
   }

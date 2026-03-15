@@ -36,7 +36,7 @@ let appConfig = null;
 // Load application configuration
 async function loadConfig() {
   try {
-    const response = await fetch('/config.json');
+    const response = await fetch('config.json');
     appConfig = await response.json();
     return appConfig;
   } catch (error) {
@@ -68,7 +68,6 @@ async function loadConfig() {
     if (response.ok) {
       bibliographyData = await response.json();
       // Add _docIndex to each entry if not present (same as bibliography.js does)
-      alert(JSON.stringify(bibliographyData[0]))
       bibliographyData.forEach((doc, index) => {
         if (doc._docIndex === undefined) {
           doc._docIndex = index;
@@ -198,7 +197,7 @@ function generateWordDistributionHTML(topicWords, topicNumber, settings = {}) {
     html += `
       <tr>
         <td>
-          <a href="/word/${encodeURIComponent(word)}" class="fw-bold text-primary word-link" title="Click to view word details">
+          <a href="word/${encodeURIComponent(word)}" class="fw-bold text-primary word-link" title="Click to view word details">
             ${word}
           </a>
         </td>
