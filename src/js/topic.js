@@ -36,7 +36,7 @@ let appConfig = null;
 // Load application configuration
 async function loadConfig() {
   try {
-    const response = await fetch('/config.json');
+    const response = await fetch('config.json');
     appConfig = await response.json();
     return appConfig;
   } catch (error) {

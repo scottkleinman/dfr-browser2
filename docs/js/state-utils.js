@@ -1,14 +1,11 @@
 // State utilities for handling MALLET topic-state files
 
-// Helper function to ensure paths are absolute
+// Helper function to ensure paths work on any sub-path deployment
 function ensureAbsolutePath(path) {
   if (!path) return path;
-  // If path already starts with /, it's absolute
-  if (path.startsWith('/')) return path;
-  // If path starts with http:// or https://, it's already absolute
   if (path.startsWith('http://') || path.startsWith('https://')) return path;
-  // Otherwise, make it absolute by prepending /
-  return '/' + path;
+  if (path.startsWith('/')) return (window.dfrBasePath || '') + path;
+  return path;
 }
 
 // Global cache for parsed state data
@@ -77,7 +74,7 @@ async function getStateFileConfig() {
   if (stateFileConfig) return stateFileConfig;
 
   try {
-    const response = await fetch('/config.json');
+    const response = await fetch('config.json');
     const config = await response.json();
     stateFileConfig = {
       path: ensureAbsolutePath(config.topic_state_file || 'sample_data/topic-state.gz'),

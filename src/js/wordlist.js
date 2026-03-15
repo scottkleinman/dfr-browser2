@@ -3,13 +3,12 @@ import { loadWordView } from './word.js';
 import { extractFullVocabulary } from './state-utils.js';
 import CachedDataLoader from './cached-data-loader.js';
 
-// Helper function to ensure absolute paths
+// Helper function to ensure paths work on any sub-path deployment
 function ensureAbsolutePath(path) {
   if (!path) return path;
-  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('/')) {
-    return path;
-  }
-  return '/' + path;
+  if (path.startsWith('http://') || path.startsWith('https://')) return path;
+  if (path.startsWith('/')) return (window.dfrBasePath || '') + path;
+  return path;
 }
 
 // Global configuration object

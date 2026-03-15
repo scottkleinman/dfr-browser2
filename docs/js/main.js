@@ -6,6 +6,8 @@ import { loadWordView } from './word.js';
 import { loadBibliography } from './bibliography.js';
 import { loadWordList } from './wordlist.js';
 import { loadAboutView } from './about.js';
+import { loadDiagnosticsView } from './diagnostics.js';
+import { renderCitationView } from './citation.js';
 import CacheManager from './cache-manager.js';
 import CachedDataLoader from './cached-data-loader.js';
 import ErrorHandler from './error-handler.js';
@@ -105,6 +107,14 @@ function parseMetadata(text) {
   });
 }
 
+// Rewrite data-route nav links to use correct base path
+function updateNavLinks() {
+  const base = window.dfrBasePath || '';
+  document.querySelectorAll('[data-route]').forEach(el => {
+    el.href = base + el.dataset.route;
+  });
+}
+
 // Initialize the application
 async function init() {
   console.log('[DFR] Initializing application...');
@@ -189,7 +199,10 @@ async function init() {
 
   // Configure router WITHOUT hashbang mode (use HTML5 history)
   console.log('[DFR] Configuring router with HTML5 history mode...');
-  window.page.base('');
+  window.page.base(window.dfrBasePath || '');
+
+  // Rewrite nav hrefs to use the correct base path
+  updateNavLinks();
 
 
 
@@ -378,7 +391,7 @@ async function populateTopicDropdown(topicKeys) {
     const li = document.createElement('li');
     const a = document.createElement('a');
     a.className = 'dropdown-item';
-    a.href = `/topic/${topicNum}`; // Use 1-based numbering in URL
+    a.href = (window.dfrBasePath || '') + `/topic/${topicNum}`; // Use 1-based numbering in URL
     a.textContent = menuText;
 
     li.appendChild(a);
@@ -399,15 +412,13 @@ function getVisibleTopicIndices() {
 }
 }
 
-// Helper function to ensure paths are absolute
+// Helper function to ensure paths work on any sub-path deployment
 function ensureAbsolutePath(path) {
   if (!path) return path;
-  // If path already starts with /, it's absolute
-  if (path.startsWith('/')) return path;
-  // If path starts with http:// or https://, it's already absolute
   if (path.startsWith('http://') || path.startsWith('https://')) return path;
-  // Otherwise, make it absolute by prepending /
-  return '/' + path;
+  // Legacy absolute paths get the base prepended; relative paths resolve via <base> tag
+  if (path.startsWith('/')) return (window.dfrBasePath || '') + path;
+  return path;
 }
 
 // Auto-load files from config paths
@@ -514,6 +525,12 @@ async function autoLoadData() {
 
     // Mark data as loaded
     window.dfrState.dataLoaded = true;
+
+    // Show footer after data is loaded
+    const footer = document.getElementById('app-footer');
+    if (footer) {
+      footer.style.display = 'block';
+    }
   } catch (e) {
     console.error('[DFR] Sample data not loaded:', e);
     throw e; // Re-throw so ensureDataLoaded can catch it
@@ -625,6 +642,12 @@ function setupFileUploadHandler() {
 
       // Mark data as loaded
       window.dfrState.dataLoaded = true;
+
+      // Show footer after data is loaded
+      const footer = document.getElementById('app-footer');
+      if (footer) {
+        footer.style.display = 'block';
+      }
 
       // Load overview with the data
       window.page('/');
@@ -827,6 +850,15 @@ function setupRoutes() {
     );
   });
 
+  // Citation route
+  window.page('/citation/:id', async (ctx) => {
+    if (!await ensureDataLoaded()) return;
+    console.log('[DFR] Route: Citation view:', ctx.params.id);
+    setActiveNav('/bibliography');
+    const docIndex = parseInt(ctx.params.id);
+    await renderCitationView(docIndex);
+  });
+
   // Word list/index route
   window.page('/wordlist', async () => {
     if (!await ensureDataLoaded()) return;
@@ -844,6 +876,13 @@ function setupRoutes() {
     console.log('[DFR] Route: About');
     setActiveNav('/about');
     loadAboutView();
+  });
+
+  // Diagnostics route
+  window.page('/diagnostics', () => {
+    console.log('[DFR] Route: Diagnostics');
+    setActiveNav('/diagnostics');
+    loadDiagnosticsView();
   });
 
   // Settings route (modal, not a page)
@@ -875,7 +914,7 @@ function setActiveNav(path) {
   });
 
   // Add active class to matching link
-  const navLink = document.querySelector(`.nav-link[href="${path}"]`);
+  const navLink = document.querySelector(`.nav-link[data-route="${path}"]`);
   if (navLink) {
     navLink.classList.add('active');
   }
