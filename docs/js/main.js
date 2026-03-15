@@ -323,7 +323,7 @@ async function ensureDataLoaded() {
   if (!window.dfrState.config) {
     // Load config first if not already loaded
     try {
-      const response = await fetch('/config.json');
+      const response = await fetch('config.json');
       window.dfrState.config = await response.json();
       console.log('[DFR] Config loaded for auto-load');
     } catch (error) {
