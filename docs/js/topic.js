@@ -30,6 +30,30 @@ export async function loadTopicView(topicKeys, docTopic, metadata, topicId, docT
     return;
   }
 
+// Global configuration object
+let appConfig = null;
+
+// Load application configuration
+async function loadConfig() {
+  try {
+    const response = await fetch('config.json');
+    appConfig = await response.json();
+    return appConfig;
+  } catch (error) {
+    console.error('Failed to load configuration:', error);
+    // Fallback to default English configuration
+    appConfig = {
+      language: {
+        default: 'en',
+        configs: {
+          'en': { locale: 'en-US' }
+        }
+      }
+    };
+    return appConfig;
+  }
+}
+
   // Get user settings
   const settings = await window.getSettings();
   const wordsCount = settings.wordsInTopic || 50;
@@ -37,8 +61,8 @@ export async function loadTopicView(topicKeys, docTopic, metadata, topicId, docT
   // Load bibliography data for formatted citations
   let bibliographyData = null;
   try {
-    const config = window.appConfig || { bibliography: { path: 'data/liu/bibliography.json' } };
-    const bibliographyPath = config?.bibliography?.path || 'data/liu/bibliography.json';
+    const config = appConfig || { bibliography: { path: 'data/bibliography.json' } };
+    const bibliographyPath = config?.bibliography?.path || 'data/bibliography.json';
     const fullPath = bibliographyPath.startsWith('/') ? bibliographyPath : '/' + bibliographyPath;
     const response = await fetch(fullPath);
     if (response.ok) {
@@ -173,7 +197,7 @@ function generateWordDistributionHTML(topicWords, topicNumber, settings = {}) {
     html += `
       <tr>
         <td>
-          <a href="/word/${encodeURIComponent(word)}" class="fw-bold text-primary word-link" title="Click to view word details">
+          <a href="word/${encodeURIComponent(word)}" class="fw-bold text-primary word-link" title="Click to view word details">
             ${word}
           </a>
         </td>

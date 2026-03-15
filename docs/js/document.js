@@ -3,15 +3,12 @@
 import { extractTopicWords } from './state-utils.js';
 import { getTopicLabel, getMetadataValue } from './topic-config.js';
 
-// Helper function to ensure paths are absolute
+// Helper function to ensure paths work on any sub-path deployment
 function ensureAbsolutePath(path) {
   if (!path) return path;
-  // If path already starts with /, it's absolute
-  if (path.startsWith('/')) return path;
-  // If path starts with http:// or https://, it's already absolute
   if (path.startsWith('http://') || path.startsWith('https://')) return path;
-  // Otherwise, make it absolute by prepending /
-  return '/' + path;
+  if (path.startsWith('/')) return (window.dfrBasePath || '') + path;
+  return path;
 }
 
 // Config management
@@ -374,6 +371,12 @@ export async function loadDocumentView(topicKeys, docTopic, metadata, referenceD
     html += `<div class="d-flex justify-content-between align-items-center">`;
     html += `<div>`;
     html += `<span class="badge bg-secondary me-2">Tokens: ${totalTokens}</span>`;
+
+    // Cite button - always visible
+    html += `<button type="button" class="btn btn-primary btn-sm" onclick="window.page('/citation/${referenceData.docIndex}')">`;
+    html += `<i class="bi bi-quote"></i> Cite`;
+    html += `</button>`;
+
 
     if (!appConfig?.embargo) {
       html += `<button type="button" class="btn btn-primary btn-sm" onclick="handleViewTextClick(${JSON.stringify(referenceData).replace(/"/g, '&quot;')})">`;
