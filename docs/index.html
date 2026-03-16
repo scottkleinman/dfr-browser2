@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Base path setup for correct routing and asset loading -- Do not Move! -->
   <script>
     (function () {
       var p = window.location.pathname;
@@ -16,6 +17,15 @@
       document.head.insertBefore(b, document.head.firstChild);
       window.dfrBasePath = root === '/' ? '' : root.replace(/\/$/, '');
     }());
+  </script>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HC6D6P3BF7"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-HC6D6P3BF7');
   </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
