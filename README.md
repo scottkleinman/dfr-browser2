@@ -741,6 +741,10 @@ Use the GitHub Issues to open a ticket.
 
 ## Changelog
 
+### Version 0.2.6
+
+- Fix browser loading cached model files when changing models.
+
 ### Version 0.2.5
 
 - Refactor to allow deployment on remote servers.
