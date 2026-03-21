@@ -2,6 +2,14 @@
 import { extractTopicWords } from './state-utils.js';
 import { getTopicLabel } from './topic-config.js';
 
+// Helper function to ensure paths work on any sub-path deployment
+function ensureAbsolutePath(path) {
+  if (!path) return path;
+  if (path.startsWith('http://') || path.startsWith('https://')) return path;
+  if (path.startsWith('/')) return (window.dfrBasePath || '') + path;
+  return (window.dfrBasePath || '') + '/' + path;
+}
+
 // Store current topic data for filtering
 let currentTopicData = null;
 let currentSelectedYear = null;
