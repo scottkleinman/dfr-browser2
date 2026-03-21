@@ -5,9 +5,10 @@
     <title>Redirecting...</title>
     <script>
       const path = window.location.pathname || '/';
-      const base = '/dfr-browser2';
+      const base = window.dfrBasePath || '/dfr-browser2';
       const normalized = path.startsWith(base) ? path.slice(base.length) : path;
-      const redirect = `${base}/#${normalized}`;
+      const locationHash = normalized.startsWith('/') ? normalized : `/${normalized}`;
+      const redirect = `${base}/#${locationHash}`;
       window.location.replace(redirect);
     </script>
   </head>
