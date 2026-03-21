@@ -68,10 +68,10 @@ async function loadConfig() {
 
   // Load bibliography data for formatted citations
   let bibliographyData = null;
-  try {
+ try {
     const config = appConfig || { bibliography: { path: 'data/bibliography.json' } };
     const bibliographyPath = config?.bibliography?.path || 'data/bibliography.json';
-    const fullPath = bibliographyPath.startsWith('/') ? bibliographyPath : '/' + bibliographyPath;
+    const fullPath = ensureAbsolutePath(bibliographyPath);
     const response = await fetch(fullPath);
     if (response.ok) {
       bibliographyData = await response.json();
