@@ -2,6 +2,14 @@
 import { extractTopicWords } from './state-utils.js';
 import { getTopicLabel } from './topic-config.js';
 
+// Helper function to ensure paths work on any sub-path deployment
+function ensureAbsolutePath(path) {
+  if (!path) return path;
+  if (path.startsWith('http://') || path.startsWith('https://')) return path;
+  if (path.startsWith('/')) return (window.dfrBasePath || '') + path;
+  return (window.dfrBasePath || '') + '/' + path;
+}
+
 // Store current topic data for filtering
 let currentTopicData = null;
 let currentSelectedYear = null;
@@ -36,7 +44,8 @@ let appConfig = null;
 // Load application configuration
 async function loadConfig() {
   try {
-    const response = await fetch('config.json');
+    const configUrl = ensureAbsolutePath('config.json');
+    const response = await fetch(configUrl);
     appConfig = await response.json();
     return appConfig;
   } catch (error) {
@@ -63,7 +72,7 @@ async function loadConfig() {
   try {
     const config = appConfig || { bibliography: { path: 'data/bibliography.json' } };
     const bibliographyPath = config?.bibliography?.path || 'data/bibliography.json';
-    const fullPath = bibliographyPath.startsWith('/') ? bibliographyPath : '/' + bibliographyPath;
+    const fullPath = ensureAbsolutePath(bibliographyPath);
     const response = await fetch(fullPath);
     if (response.ok) {
       bibliographyData = await response.json();

@@ -115,6 +115,18 @@ function updateNavLinks() {
   });
 }
 
+// Convert hash-based fallback route (`/#/topic/2`) into history path (`/topic/2`) so page.js can route.
+function normalizeHashFallbackRoute() {
+  const hash = window.location.hash;
+  if (hash && hash.startsWith('#/')) {
+    const route = hash.slice(1); // '/topic/2'
+    const base = window.dfrBasePath || '';
+    const newUrl = `${base}${route}`;
+    window.history.replaceState({}, '', newUrl);
+    console.log(`[DFR] Hash fallback normalized to history route: ${newUrl}`);
+  }
+}
+
 // Initialize the application
 async function init() {
   console.log('[DFR] Initializing application...');
@@ -191,6 +203,9 @@ async function init() {
     };
     console.warn('[DFR] Using default config');
   }
+
+  // Handle hash-based 404 fallback route rewriting, then setup routes
+  normalizeHashFallbackRoute();
 
   // Setup page.js routes
   console.log('[DFR] Setting up routes...');

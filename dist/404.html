@@ -1,0 +1,18 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Redirecting...</title>
+    <script>
+      const path = window.location.pathname || '/';
+      const base = window.dfrBasePath || '/dfr-browser2';
+      const normalized = path.startsWith(base) ? path.slice(base.length) : path;
+      const locationHash = normalized.startsWith('/') ? normalized : `/${normalized}`;
+      const redirect = `${base}/#${locationHash}`;
+      window.location.replace(redirect);
+    </script>
+  </head>
+  <body>
+    <p>Redirecting…</p>
+  </body>
+</html>
