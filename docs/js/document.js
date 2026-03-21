@@ -18,9 +18,11 @@ let dataSourceCache = null;
 async function loadConfig() {
   try {
     const cacheBuster = Date.now();
-    const response = await fetch(`/config.json?v=${cacheBuster}`, {
+    const configUrl = ensureAbsolutePath('config.json') + `?v=${cacheBuster}`;
+const response = await fetch(configUrl, { cache: 'no-cache' });
+/*    const response = await fetch(`/config.json?v=${cacheBuster}`, {
       cache: 'no-cache'
-    });
+    });*/
 
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
